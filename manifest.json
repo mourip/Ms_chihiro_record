@@ -1,0 +1,30 @@
+{
+  "name": "ちひろさんの記録簿",
+  "version": "1.1.0",
+  "manifest_version": 2,
+  "description": "お疲れ様です！今日もプロデューサーさんのお手伝いしますね",
+  "permissions": [
+   "storage",
+   "unlimitedStorage"
+ ],
+
+  "content_scripts": [
+
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js", "item.js"],
+      "run_at": "document_idle"
+    },
+
+    {
+      "matches": ["http://sp.mbga.jp/_pf_pay_confirm*"],
+      "js": ["jquery-2.1.4.min.js", "kakin.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js", "event_item_puti.js"],
+      "run_at": "document_idle"
+    },
+  ]
+}
