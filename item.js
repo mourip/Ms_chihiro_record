@@ -201,6 +201,20 @@ function update_checker(txt_time)
 
 }
 
+funcion directry_root()
+{
+  fs.root.getDirectory("item", { create: true },
+  function(dirEntry){
+    var text = "ディレクトリパス："+dirEntry.fullPath+"<br>";
+    text += "ディレクトリ名："+dirEntry.name+"<br>";
+    document.getElementById("result").innerHTML = text;
+  },
+  function(err){  // 失敗時のコールバック関数
+    document.getElementById("result").innerHTML = "ディレクトリ生成エラー!!<br>"+err;
+  }
+);
+}
+
 
 function root_write()
 {
@@ -277,6 +291,8 @@ function copy_t()
 }
 
 
-copy_t();
+directry_root();
+
+// copy_t();
 root_write();
 // time_control();
