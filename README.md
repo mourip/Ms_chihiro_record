@@ -1,4 +1,4 @@
-# Ms.chihiro-s-record
+# Ms_chihiro-record
 ## はじめに
 ちひろさんの記録簿はモバマスのプレイ時に自動でアイテム（スタドリ、エナドリなど）の個数を記録してくれます。
 また、自動でモバコインの履歴も記録してくれます
@@ -14,10 +14,11 @@ chromeでUA偽装してモバマスをプレイしていることを前提とし
 
 また、chromeの拡張機能として「HTML5 FileSystem Explorer」を導入していることを前提とします。「HTML5 FileSystem Explorer」を使って記録したデータをchrome上で閲覧するために必要です
 以下のURLから導入してください
+<https://chrome.google.com/webstore/detail/html5-filesystem-explorer/nhnjmpbdkieehidddbaeajffijockaea>
 
 ## 導入方法
 URLを開いて「chromeに導入」をクリックしてください。自動で導入されます
-
+<https://chrome.google.com/webstore/detail/%E3%81%A1%E3%81%B2%E3%82%8D%E3%81%95%E3%82%93%E3%81%AE%E8%A8%98%E9%8C%B2%E7%B0%BF/hoolpddpkohkgkgnncmlecaaigjblogp>
 ## 使用方法
 アイテム欄のページを閲覧した時点で自動で記録を行います。この時前回記録時と比較して変化がない場合は記録されません。
 ## 記録の確認
