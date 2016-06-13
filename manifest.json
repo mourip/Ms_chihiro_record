@@ -25,6 +25,6 @@
       "matches": ["http://sp.pf.mbga.jp/*"],
       "js": ["jquery-2.1.4.min.js", "event_item_puti.js"],
       "run_at": "document_idle"
-    },
+    }
   ]
 }
