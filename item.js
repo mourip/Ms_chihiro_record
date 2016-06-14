@@ -38,7 +38,7 @@ function memo_write_1(txt, num, dif) {
 
     var txt_name ="item/" +txt + ".txt"
         // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024 * 1024, function(fileSystem) {
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024*5, function(fileSystem) {
 
         fileSystem.root.getFile(txt_name, {
             'create': true
@@ -190,9 +190,9 @@ function update_checker(txt_time) {
 function delete_files(txt) {
   // PRESISTENTで勝手に削除されないようにする
   var txt_name=txt+".txt";
-  webkitRequestFileSystem(PERSISTENT, 1024*1024, function(fileSystem){
+  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
 
-    fileSystem.root.getFile(txt_name, {'create':true}, function(fileEntry){
+    fileSystem.root.getFile(txt_name, {'create':false}, function(fileEntry){
       fileEntry.remove(function() {
       console.log('File removed.');
     });
@@ -207,7 +207,7 @@ function write_copy(txt, data) {
     var txt_name = "item/" + String(txt) + ".txt";
     // PRESISTENTで勝手に削除されないようにする
     // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024*1024, function(fileSystem){
+    webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
 
       fileSystem.root.getFile(txt_name, {'create':true}, function(fileEntry){
         fileEntry.createWriter(function(fileWriter){
@@ -229,6 +229,7 @@ function write_copy(txt, data) {
         });
       });
     });
+    delete_files(txt);
 }
 
 function copy_data_write(txt) {
@@ -288,7 +289,7 @@ function directry_root() {
     // console.log(arrays);
     for (var i = 0; i < arrays.length; i++) {
         copy_data_write(String(arrays[i]));
-        delete_files(arrays[i]);
+        // delete_files(arrays[i]);
     }
 
 

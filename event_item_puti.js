@@ -40,9 +40,9 @@ function puti_write(normal_drink,normal_drink_dif,half_drink,half_drink_dif)
   var utf8half_dif=unescape(encodeURIComponent(half_drink_dif));
 
   // PRESISTENTで勝手に削除されないようにする
-  webkitRequestFileSystem(PERSISTENT, 1024*1024, function(fileSystem){
+  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
 
-    fileSystem.root.getFile("puti.txt", {'create':true}, function(fileEntry){
+    fileSystem.root.getFile("event_items/puti.txt", {'create':true}, function(fileEntry){
       fileEntry.createWriter(function(fileWriter){
 
         //  ファイルの書き込み位置は、一番最後とする
@@ -83,12 +83,12 @@ function puti_write(normal_drink,normal_drink_dif,half_drink,half_drink_dif)
 
 function puti_checker(normal_drink,half_drink)
 {
-  navigator.webkitPersistentStorage.requestQuota(1024*1024*5, function(bytes)
+  navigator.webkitPersistentStorage.requestQuota(1024*1024*10, function(bytes)
    {
          window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs)
           {
            // ファイル取得
-           fs.root.getFile("puti.txt", {create: true}, function(fileEntry)
+           fs.root.getFile("event_items/puti.txt", {create: true}, function(fileEntry)
           {
              fileEntry.file(function(file)
               {
@@ -160,4 +160,110 @@ function puti_log()
 
   }
 }
+
+function delete_files_puti() {
+  // PRESISTENTで勝手に削除されないようにする
+  var txt_name="puti.txt";
+  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
+
+    fileSystem.root.getFile(txt_name, {'create':false}, function(fileEntry){
+      fileEntry.remove(function() {
+      console.log('File removed.');
+    });
+  });
+});
+}
+
+
+
+function write_copy_puti(data) {
+    console.log(data);
+    var txt_name = "event_items/puti.txt";
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
+
+      fileSystem.root.getFile(txt_name, {'create':true}, function(fileEntry){
+        fileEntry.createWriter(function(fileWriter){
+
+
+          //  出力行
+          var lines = data;
+          //  データ行の作成
+         var blob = new Blob([lines],{type: 'text/plain'});
+
+          fileWriter.write(blob);
+          fileWriter.onwriteend = function(e) {
+            console.log('puti:copy completed.');
+          };
+          fileWriter.onerror = function(e) {
+            console.log('puti:copy failed: ' + e.toString());
+          };
+
+        });
+      });
+    });
+
+    delete_files_puti();
+}
+
+function copy_data_read_puti() {
+    //var txt_name = "puti.txt";
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+      //  var txt_t = txt;
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            // var txt_name1 = txt_t;
+            // ファイル取得
+            fs.root.getFile("puti.txt", {
+                    create: false
+                },
+                function(fileEntry) {
+                    // var txt_name2 = txt_name1;
+                    fileEntry.file(function(file) {
+                        var reader = new FileReader();
+                        reader.onloadend = function(e) {
+                            data = e.target.result;
+                            console.log(data);
+                            // console.log(String(txt_name2));
+                            write_copy_puti(data);
+                            // delete_files(txt_name2);
+
+                        };
+                        reader.readAsText(file);
+                    });
+                },
+                function(err) {
+                    console.log(err);
+                });
+        });
+    });
+
+}
+
+
+function directry_root_puti() {
+
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("event_items", {
+                    create: true
+                },
+                function(dirEntry) {
+                    var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
+    copy_data_read_puti();
+
+
+
+}
+
+
+directry_root_puti();
 puti_log();
