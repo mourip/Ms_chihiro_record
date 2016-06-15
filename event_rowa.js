@@ -209,7 +209,7 @@ function rowa_log()
   var rowa_check=document.querySelector("#event_header_info > div > div:nth-child(2) > span");
 
 
-  console.log(rowa_check.innerText);
+  // console.log(rowa_check.innerText);
   if(rowa_check.innerText=="BP")
   {
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
@@ -230,17 +230,17 @@ function rowa_log()
     });
     //このときはプチコレのページである
     //よってアイテムを記録することができる
-    var normal_drink=document.querySelector("#event_main_graphic > div.event_items > div:nth-child(1)");
+    var normal_drink=document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(1)");
     var normal_drink_num=normal_drink.innerText.substr(1);
     console.log(normal_drink_num);
 
-    var half_drink=document.querySelector("#event_main_graphic > div.event_items > div:nth-child(2)");
+    var half_drink=document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(2)");
     var half_drink_num=half_drink.innerText.substr(1);
     console.log(half_drink_num);
-    // rowa_checker(normal_drink_num,half_drink_num);
-    var pt_selector=document.querySelector("#top > section:nth-child(25) > div.area_tab_2 > section > ul:nth-child(2) > li:nth-child(2)");
+    rowa_checker(normal_drink_num,half_drink_num);
+    var pt_selector=document.querySelector("#top > section:nth-child(14) > div.area_tab.t-Cnt > section > ul:nth-child(8) > li:nth-child(2)");
     //,区切りが嫌であるのでなんとかして変更する
-    var pt_str=pt_selector.innerText.split(":")[1].split(" ")[1];
+    var pt_str=pt_selector.innerText.split(":")[1]
     var pt_array=pt_str.split(",");
     var pt="";
     for(var i=0;i<pt_array.length;i++)
