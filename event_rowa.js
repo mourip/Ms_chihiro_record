@@ -125,7 +125,7 @@ function rowa_checker(normal_drink, half_drink) {
     });
 }
 
-function pt_checker_rowa(pt) {
+function pt_checker_rowa(rowa_pt) {
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             fs.root.getDirectory("event_pt", {
@@ -156,29 +156,39 @@ function pt_checker_rowa(pt) {
                         // console.log(data);
                         if (!data) {
                             console.log("白紙なので、作成します");
-                            rowa_write(normal_drink, 0, half_drink, 0);
+                            rowa_write_pt(pt, 0);
 
                         } else if (data) {
                             var array_temp = data.split("\n");
-                            // console.log(array_temp);
-                            // var last_time=array_temp[array_temp.length-2].split(",")[0];
-                            var last_normal_drink = array_temp[array_temp.length - 2].split(",")[1];
-                            var last_half_drink = array_temp[array_temp.length - 2].split(",")[3];
-                            // console.log(last_item_num+","+last_half_drink);
+                            //year/month/day/hour/minute/second/の順で得られる
+                            var last_time_all = array_temp[array_temp.length - 2].split(",")[0];
+                            var last_time_pt = array_temp[array_temp.length - 2].split(",")[1];
+                            //これで配列が得られる
+                            var last_time_each = last_time_all.split("/");
 
-                            //ここからアップデートが必要かを判断する関数に飛ばす
-                            // console.log(last_time);
-                            // var flag=update_checker(last_time);
-                            if (String(last_normal_drink) != String(normal_drink) || String(last_half_drink) != String(half_drink)) {
-                                console.log("更新します");
-                                rowa_write(normal_drink, Number(normal_drink) - Number(last_normal_drink), half_drink, Number(half_drink) - Number(last_half_drink));
-                            } else {
-                                console.log("更新しない");
-                            }
+                            var renew_flag = false;
+
+                            //今の時刻を得る
+                            var DD = new Date();
+                            var Year = DD.getYear() + 1900;
+                            var Month = DD.getMonth() + 1;
+                            var Day = DD.getDate();
+                            var Hours = DD.getHours();
+                            var Minutes = DD.getMinutes();
+                            var Seconds = DD.getSeconds();
+
+                            //今のじ
+
+
+
+
+
+                        } else {
+                            console.log("更新しない");
                         }
-                    };
-                    reader.readAsText(file);
+                    }
                 });
+                reader.readAsText(file);
             });
         });
     });
@@ -224,14 +234,14 @@ function rowa_log() {
         rowa_checker(normal_drink_num, half_drink_num);
 
         //総合ポイントのセレクタ-。これは毎回変える必要があると思う
-        // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからを記録している。
+        // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
         var pt_selector = document.querySelector("#top > section:nth-child(14) > div.area_tab.t-Cnt > section > ul:nth-child(8) > li:nth-child(3)");
 
         //,区切りが嫌であるのでなんとかして変更する
         var pt_str = pt_selector.innerText.split(":")[1]
             // console.log(pt_str);
         if (pt_selector) {
-            if (isNaN(pt_str)) //数字じゃない。つまり,が含まれている時
+            if (isNaN(pt_str)) //,が含まれている時はNAN(Not aNumber)として判定される
             {
                 var pt_array = pt_str.split(",");
                 var pt = "";
@@ -240,15 +250,14 @@ function rowa_log() {
                 }
                 console.log(pt);
                 //pt_checker_rowa(pt);
-            } else //数字であるとき
+            } else //,が含まれいないときは
             {
                 console.log(pt_str);
             }
 
 
-        } else
-        {
-          console.log("ptをしめすセレクタ-がありません");
+        } else {
+            console.log("ptをしめすセレクタ-がありません");
         }
     }
 
