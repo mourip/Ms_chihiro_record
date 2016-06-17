@@ -38,7 +38,7 @@ function moba_write(num,dif)
   var utf8dif = unescape(encodeURIComponent(dif));
 
   // PRESISTENTで勝手に削除されないようにする
-  webkitRequestFileSystem(PERSISTENT, 1024*1024, function(fileSystem){
+  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
 
     fileSystem.root.getFile("moba_coin.txt", {'create':true}, function(fileEntry){
       fileEntry.createWriter(function(fileWriter){
@@ -83,7 +83,7 @@ function moba_write(num,dif)
 
 function moba_checker(num)
 {
-  navigator.webkitPersistentStorage.requestQuota(1024*1024*5, function(bytes)
+  navigator.webkitPersistentStorage.requestQuota(1024*1024*10, function(bytes)
    {
          window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs)
           {
@@ -145,4 +145,8 @@ function kakin()
   localStorage["test"]="hoge";
   console.log(localStorage["keya"]);
 }
+
+
+
+
 kakin();

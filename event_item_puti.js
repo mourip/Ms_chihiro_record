@@ -133,6 +133,77 @@ function puti_checker(normal_drink,half_drink)
   });
 }
 
+function pt_checker_puti(pt)
+{
+  navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+      window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+          fs.root.getDirectory("event_pt", {
+                  create: true
+              },
+              function(dirEntry) {
+                  var text = "ディレクトリパス：" + dirEntry.fullPath;
+                  console.log(text);
+                  //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                  //document.getElementById("result").innerHTML = text;
+              },
+              function(err) { // 失敗時のコールバック関数
+                  console.log(err);
+              });
+      });
+  });
+
+  navigator.webkitPersistentStorage.requestQuota(1024*1024*10, function(bytes)
+   {
+         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs)
+          {
+           // ファイル取得
+           fs.root.getFile("event_pt/puti.txt", {create: true}, function(fileEntry)
+          {
+             fileEntry.file(function(file)
+              {
+                  var reader = new FileReader();
+                  reader.onloadend = function(e)
+                  {
+                    data = e.target.result;
+                    // console.log(data);
+                    if(!data)
+                    {
+                      console.log("白紙なので、作成します");
+                      puti_write(normal_drink,0,half_drink,0);
+
+                    }
+                    else if(data)
+                    {
+                      var array_temp=data.split("\n");
+                      // console.log(array_temp);
+                      // var last_time=array_temp[array_temp.length-2].split(",")[0];
+                      var last_normal_drink=array_temp[array_temp.length-2].split(",")[1];
+                      var last_half_drink=array_temp[array_temp.length-2].split(",")[3];
+                      // console.log(last_item_num+","+last_half_drink);
+
+                      //ここからアップデートが必要かを判断する関数に飛ばす
+                      // console.log(last_time);
+                      // var flag=update_checker(last_time);
+                      if(String(last_normal_drink)!=String(normal_drink) || String(last_half_drink)!=String(half_drink))
+                      {
+                        console.log("更新します");
+                        puti_write(normal_drink,Number(normal_drink)-Number(last_normal_drink),half_drink,Number(half_drink)-Number(last_half_drink));
+                      }
+                      else
+                      {
+                        console.log("更新しない");
+                      }
+                    }
+                  };
+                  reader.readAsText(file);
+              });
+          });
+    });
+  });
+}
+
+
+
 function puti_log()
 {
   var puti_check=document.querySelector("#top > div.m-Top10 > a > div > span");
@@ -154,10 +225,17 @@ function puti_log()
     var half_drink_num=half_drink.innerText.substr(1);
     console.log(half_drink_num);
     puti_checker(normal_drink_num,half_drink_num);
-
-
-
-
+    var pt_selector=document.querySelector("#top > section:nth-child(25) > div.area_tab_2 > section > ul:nth-child(2) > li:nth-child(2)");
+    //,区切りが嫌であるのでなんとかして変更する
+    var pt_str=pt_selector.innerText.split(":")[1].split(" ")[1];
+    var pt_array=pt_str.split(",");
+    var pt="";
+    for(var i=0;i<pt_array.length;i++)
+    {
+      pt+=String(pt_array[i]);
+    }
+    console.log(pt);
+    // pt_checker_puti(pt);
   }
 }
 
@@ -232,7 +310,7 @@ function copy_data_read_puti() {
                     });
                 },
                 function(err) {
-                    console.log(err);
+                    // console.log(err);
                 });
         });
     });
