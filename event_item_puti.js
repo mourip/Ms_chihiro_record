@@ -343,5 +343,5 @@ function directry_root_puti() {
 }
 
 
-directry_root_puti();
+// directry_root_puti();
 puti_log();
