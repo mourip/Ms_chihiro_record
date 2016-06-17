@@ -125,6 +125,67 @@ function rowa_checker(normal_drink, half_drink) {
     });
 }
 
+function rowa_write_pt(rowa_pt,rowa_pt_dif)
+{
+  var DD = new Date();
+  var Year = DD.getYear() + 1900;
+  var Month = DD.getMonth() + 1;
+  var Day = DD.getDate();
+  var Hours = DD.getHours();
+  var Minutes = DD.getMinutes();
+  var Seconds = DD.getSeconds();
+  var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
+  var dates = date.join("/");
+  // console.log(dates);
+  var utf8pt = unescape(encodeURIComponent(rowa_pt));
+  var utf8pt_dif = unescape(encodeURIComponent(rowa_pt_dif));
+
+  // PRESISTENTで勝手に削除されないようにする
+  webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
+
+      fileSystem.root.getFile("event_pt/rowa.txt", {
+          'create': true
+      }, function(fileEntry) {
+          fileEntry.createWriter(function(fileWriter) {
+
+              //  ファイルの書き込み位置は、一番最後とする
+              fileWriter.seek(fileWriter.length);
+              //  出力行
+              var lines = '';
+
+
+              //  0バイトファイルの場合、ヘッダ行を作成する
+              if (fileWriter.length == 0) {
+                  var headers = new Array("time", "pt", "difference");
+                  lines = headers.join(",") + "\n";
+
+              }
+
+              //  データ行の作成
+
+              var details = new Array(dates, utf8pt, utf8pt_dif);
+              lines += details.join(",") + "\n";
+              var blob = new Blob([lines], {
+                  type: 'text/plain'
+              });
+
+              fileWriter.write(blob);
+
+
+              fileWriter.onwriteend = function(e) {
+                  console.log('Write completed.');
+              };
+
+              fileWriter.onerror = function(e) {
+                  console.log('Write failed: ' + e.toString());
+              };
+
+          });
+      });
+  });
+}
+
+
 function pt_checker_rowa(rowa_pt) {
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
@@ -133,7 +194,7 @@ function pt_checker_rowa(rowa_pt) {
                 },
                 function(dirEntry) {
                     var text = "ディレクトリパス：" + dirEntry.fullPath;
-                    console.log(text);
+                    // console.log(text);
                     //text += "ディレクトリ名："+dirEntry.name+"<br>";
                     //document.getElementById("result").innerHTML = text;
                 },
@@ -156,13 +217,17 @@ function pt_checker_rowa(rowa_pt) {
                         // console.log(data);
                         if (!data) {
                             console.log("白紙なので、作成します");
-                            rowa_write_pt(pt, 0);
+                            rowa_write_pt(rowa_pt, 0);
 
                         } else if (data) {
                             var array_temp = data.split("\n");
                             //year/month/day/hour/minute/second/の順で得られる
+
+                            //前の時刻を取得する
                             var last_time_all = array_temp[array_temp.length - 2].split(",")[0];
+                            //前の時刻段階でのptを得る
                             var last_time_pt = array_temp[array_temp.length - 2].split(",")[1];
+
                             //これで配列が得られる
                             var last_time_each = last_time_all.split("/");
 
@@ -177,41 +242,57 @@ function pt_checker_rowa(rowa_pt) {
                             var Minutes = DD.getMinutes();
                             var Seconds = DD.getSeconds();
 
-                            //今の時刻
-                            if(last_time_each[0]！=Year)//年が一致しない場合
+                            // console.log(typeof(Year));
+                            // /*
+                            if(last_time_each[0]<String(Year))
                             {
-                              console.log("年が一致しません");
+                              console.log("年が超えました");
                               renew_flag=true;
                             }
-                            else if(last_time_each[1]!=Month)
+                            else if(last_time_each[1]<String(Month))
                             {
-                              console.log("月が一致しません");
+                              console.log("月が超えました");
                               renew_flag=true;
                             }
-                            else if(last_time_each[2]!=Day)
+                            else if(last_time_each[2]<String(Day))
                             {
-                              console.log("日が一致しません");
+                              console.log("日が超えました");
                               renew_flag=true;
                             }
-                            else if(last_time_each[3]!=Hour)
+                            else if(last_time_each[3]<String(Hours))
                             {
-                              console.log("時（hour）が一致しません")
+                              console.log("時（hour）が超えました");
+                              renew_flag=true;
                             }
-                            else if(Number(last_time_each[4])+!=Number(Minutes))
+                            else if(Number(last_time_each[4])<=Minutes-10)
                             {
-                              console.log("分")
+                              console.log("１０分が経ちました");
+                              renew_flag=true;
                             }
 
 
+                            if(renew_flag)
+                            {
+                              if(rowa_pt!=last_time_pt)
+                              {
+                                console.log("時刻も違うので更新します");
+                                rowa_write_pt(rowa_pt,Number(rowa_pt)-Number(last_time_pt));
+                              }
+                              else
+                              {
+                                console.log("時刻は違うけどptは一緒です");
+                              }
 
+                            }
 
-
-                        } else {
+                        }
+                        else {
                             console.log("更新しない");
                         }
                     }
+                    reader.readAsText(file);
+
                 });
-                reader.readAsText(file);
             });
         });
     });
@@ -223,8 +304,13 @@ function rowa_log() {
     var rowa_check = document.querySelector("#event_header_info > div > div:nth-child(2) > span");
 
 
-    // console.log(rowa_check.innerText);
-    if (rowa_check.innerText == "BP") {
+    // console.log(rowa_check);
+
+    if(rowa_check==null)
+    {
+      console.log("ptをしめすセレクタ-がありません");
+    }
+    else if (rowa_check.innerText == "BP") {
         navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
             window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
                 fs.root.getDirectory("event_items", {
@@ -232,7 +318,7 @@ function rowa_log() {
                     },
                     function(dirEntry) {
                         var text = "ディレクトリパス：" + dirEntry.fullPath;
-                        console.log(text);
+                        // console.log(text);
                         //text += "ディレクトリ名："+dirEntry.name+"<br>";
                         //document.getElementById("result").innerHTML = text;
                     },
@@ -248,12 +334,12 @@ function rowa_log() {
 
         // 部分文字列の取得。これで余分な×を消せる
         var normal_drink_num = normal_drink.innerText.substr(1);
-        console.log(normal_drink_num);
+        // console.log(normal_drink_num);
 
         // イベントのハーフドリンク。これはイベントによって共通ではない？
         var half_drink = document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(2)");
         var half_drink_num = half_drink.innerText.substr(1);
-        console.log(half_drink_num);
+        // console.log(half_drink_num);
         rowa_checker(normal_drink_num, half_drink_num);
 
         //総合ポイントのセレクタ-。これは毎回変える必要があると思う
@@ -271,16 +357,15 @@ function rowa_log() {
                 for (var i = 0; i < pt_array.length; i++) {
                     pt += String(pt_array[i]);
                 }
-                console.log(pt);
-                //pt_checker_rowa(pt);
-            } else //,が含まれいないときは
+                // console.log(pt);
+                pt_checker_rowa(pt);
+            } else //,が含まれいないときはこっち
             {
                 console.log(pt_str);
+                pt_checker_rowa(pt_str);
             }
 
 
-        } else {
-            console.log("ptをしめすセレクタ-がありません");
         }
     }
 

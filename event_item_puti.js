@@ -327,7 +327,7 @@ function directry_root_puti() {
                 },
                 function(dirEntry) {
                     var text = "ディレクトリパス：" + dirEntry.fullPath;
-                    console.log(text);
+                    // console.log(text);
                     //text += "ディレクトリ名："+dirEntry.name+"<br>";
                     //document.getElementById("result").innerHTML = text;
                 },
@@ -343,5 +343,5 @@ function directry_root_puti() {
 }
 
 
-directry_root_puti();
+// directry_root_puti();
 puti_log();
