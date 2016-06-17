@@ -270,8 +270,8 @@ function directry_root() {
                     create: true
                 },
                 function(dirEntry) {
-                    var text = "ディレクトリパス：" + dirEntry.fullPath;
-                    console.log(text);
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
                     //text += "ディレクトリ名："+dirEntry.name+"<br>";
                     //document.getElementById("result").innerHTML = text;
                 },
