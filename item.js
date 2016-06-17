@@ -254,7 +254,7 @@ function copy_data_write(txt) {
                     });
                 },
                 function(err) {
-                    console.log(err);
+                    // console.log(err);
                 });
         });
     });
