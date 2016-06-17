@@ -177,7 +177,30 @@ function pt_checker_rowa(rowa_pt) {
                             var Minutes = DD.getMinutes();
                             var Seconds = DD.getSeconds();
 
-                            //今のじ
+                            //今の時刻
+                            if(last_time_each[0]！=Year)//年が一致しない場合
+                            {
+                              console.log("年が一致しません");
+                              renew_flag=true;
+                            }
+                            else if(last_time_each[1]!=Month)
+                            {
+                              console.log("月が一致しません");
+                              renew_flag=true;
+                            }
+                            else if(last_time_each[2]!=Day)
+                            {
+                              console.log("日が一致しません");
+                              renew_flag=true;
+                            }
+                            else if(last_time_each[3]!=Hour)
+                            {
+                              console.log("時（hour）が一致しません")
+                            }
+                            else if(Number(last_time_each[4])+!=Number(Minutes))
+                            {
+                              console.log("分")
+                            }
 
 
 
