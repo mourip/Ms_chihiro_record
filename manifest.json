@@ -17,6 +17,11 @@
     },
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js", "kisei.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
       "js": ["jquery-2.1.4.min.js", "work.js"],
       "run_at": "document_idle"
     },
