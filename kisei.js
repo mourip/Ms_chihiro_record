@@ -102,12 +102,14 @@ function kisei()
                             {
                               console.log("同じ規制じゃないですね");
                               temp_kisei_write();
+
                             }
                             else
                             {
                               console.log("同じ規制ですよー");
-                              window.alert('同じ規制ですよー');
+                              // window.alert('同じ規制ですよー');
                             }
+                            $("body").html($("body").html().replace(kisei_selector.innerText ,"規制回数:"+String(temp_array.length-1)));
                           }
                       }
                       reader.readAsText(file);
