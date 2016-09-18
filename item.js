@@ -423,12 +423,12 @@ function root_write() {
         var t_slector = "#top > div:nth-child("+i+") > table > tbody > tr > td:nth-child(2)";
         //
         //
-        console.log(t_slector);
         var test = document.querySelector(t_slector);
         // console.log(test);
         if (test == null) //該当するセレクタ-がなかった場合はスルーする（アイテム以外のURLで発動するはず）
             continue;
-
+        
+        console.log(t_slector);
         var str = test.innerText.split("\n")
         console.log(str[0]); //何がアイテムあるのかの確認できる
 
