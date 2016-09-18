@@ -183,7 +183,7 @@ function event_memo_write_1(txt, num, dif) {
     });
 }
 
-
+//イベントアイテムのリストを更新する必要があるかどうかについて
 function event_item_checker(txt, num) {
     var txt_name ="event_item/" +txt + ".txt"
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
