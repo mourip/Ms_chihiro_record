@@ -80,9 +80,6 @@ function memo_write_1(txt, num, dif) {
 
 function item_checker(txt, num) {
     var txt_name ="item/" +txt + ".txt"
-
-
-
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
@@ -123,6 +120,111 @@ function item_checker(txt, num) {
 
 
 }
+
+
+
+function event_memo_write_1(txt, num, dif) {
+    var DD = new Date();
+    var Year = DD.getYear() + 1900;
+    var Month = DD.getMonth() + 1;
+    var Day = DD.getDate();
+    var Hours = DD.getHours();
+    var Minutes = DD.getMinutes();
+    var Seconds = DD.getSeconds();
+    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
+    var dates = date.join("/");
+    // console.log(dates);
+    var utf8num = unescape(encodeURIComponent(num));
+    var utf8dif = unescape(encodeURIComponent(dif));
+
+    var txt_name ="event_item/" +txt + ".txt"
+        // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024*5, function(fileSystem) {
+
+        fileSystem.root.getFile(txt_name, {
+            'create': true
+        }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
+
+                //  ファイルの書き込み位置は、一番最後とする
+                fileWriter.seek(fileWriter.length);
+                //  出力行
+                var lines = '';
+
+
+                //  0バイトファイルの場合、ヘッダ行を作成する
+                if (fileWriter.length == 0) {
+                    var headers = new Array("time", txt, "difference");
+                    lines = headers.join(",") + "\n";
+
+                }
+
+                //  データ行の作成
+
+                var details = new Array(dates, utf8num, utf8dif);
+                lines += details.join(",") + "\n";
+                var blob = new Blob([lines], {
+                    type: 'text/plain'
+                });
+
+                fileWriter.write(blob);
+
+
+                fileWriter.onwriteend = function(e) {
+                    console.log(txt_name + 'Write completed.');
+                };
+
+                fileWriter.onerror = function(e) {
+                    console.log('Write failed: ' + e.toString());
+                };
+
+            });
+        });
+    });
+}
+
+
+function event_item_checker(txt, num) {
+    var txt_name ="event_item/" +txt + ".txt"
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            // ファイル取得
+            fs.root.getFile(txt_name, {
+                create: true
+            }, function(fileEntry) {
+                fileEntry.file(function(file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function(e) {
+                        data = e.target.result;
+                        // console.log(data);
+                        if (!data) {
+                            console.log("白紙なので、作成します");
+                            event_memo_write_1(txt, num, 0);
+                        } else if (data) {
+                            var array_temp = data.split("\n");
+                            // console.log(array_temp);
+                            // var last_time=array_temp[array_temp.length-2].split(",")[0];
+                            var last_item_num = array_temp[array_temp.length - 2].split(",")[1];
+                            console.log(last_item_num);
+
+                            //ここからアップデートが必要かを判断する関数に飛ばす
+                            // console.log(last_time);
+                            // var flag=update_checker(last_time);
+                            if (String(last_item_num) != String(num)) {
+                                console.log("更新します");
+                                event_memo_write_1(txt, num, Number(num) - Number(last_item_num));
+                            } else {
+                                console.log("更新しない");
+                            }
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            });
+        });
+    });
+}
+
 
 
 //時間見る関数（今は使っていない）
@@ -262,8 +364,9 @@ function copy_data_write(txt) {
 }
 
 
+//ディレクトリを作成するための関数
 function directry_root() {
-
+  // 通常アイテムを管理するitemフォルダを作成するための処理
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             fs.root.getDirectory("item", {
@@ -281,8 +384,29 @@ function directry_root() {
         });
     });
 
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("event_item", {
+                    create: true
+                },
+                function(dirEntry) {
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
+
+
+
+
     var arrays = ["stamina", "energy", "my_stamina_half", "my_energy_half", "my_stamina", "my_energy"];
     // console.log(arrays);
+    // データの引き継ぎ用の処置（そろそろいらない気がする）
     for (var i = 0; i < arrays.length; i++) {
         copy_data_write(String(arrays[i]));
         // delete_files(arrays[i]);
@@ -293,11 +417,13 @@ function directry_root() {
 
 
 function root_write() {
-    //セレクタ-の配列
-    var slector_s = ["#top > div:nth-child(5) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(13) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(21) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(29) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(37) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(45) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(53) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(62) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(71) > table > tbody > tr > td:nth-child(2)", "#top > div:nth-child(80) > table > tbody > tr > td:nth-child(2)"];
-
-    for (var i = 0; i < slector_s.length; i++) {
-        var t_slector = slector_s[i];
+    // #top > div:nth-child(6) > table > tbody > tr > td:nth-child(2
+    for (var i = 0; i < 100; i++) {
+        //forループで無理やり記録を取る
+        var t_slector = "#top > div:nth-child("+i+") > table > tbody > tr > td:nth-child(2)";
+        //
+        //
+        console.log(t_slector);
         var test = document.querySelector(t_slector);
         // console.log(test);
         if (test == null) //該当するセレクタ-がなかった場合はスルーする（アイテム以外のURLで発動するはず）
@@ -310,14 +436,14 @@ function root_write() {
             case "スタミナドリンク":
                 var t_num_selector = t_slector + ">span.pink";
                 var have_num = document.querySelector(t_num_selector);
-                // console.log(have_num.innerText);
+                console.log(str[0]+":"+have_num.innerText);
                 //スタドリを記録するファイルを読み取る
                 item_checker("stamina", have_num.innerText);
                 break;
             case "エナジードリンク":
                 var t_num_selector = t_slector + ">span.pink";
                 var have_num = document.querySelector(t_num_selector);
-                // console.log(have_num.innerText);
+                console.log(have_num.innerText);
                 //スタドリを記録するファイルを読み取る
                 item_checker("energy", have_num.innerText);
                 break;
@@ -350,7 +476,86 @@ function root_write() {
                 //スタドリを記録するファイルを読み取る
                 item_checker("my_energy", have_num.innerText);
                 break;
+            case "LPドリンク":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                console.log(have_num.innerText);
+                //スタドリを記録するファイルを読み取る
+                event_item_checker("LP", have_num.innerText);
+                break;
 
+            case "LPドリンク1/6":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                console.log(have_num.innerText);
+                //スタドリを記録するファイルを読み取る
+                event_item_checker("LP_half", have_num.innerText);
+                break;
+            case "APドリンク":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("AP", have_num.innerText);
+                break;
+            case "APドリンク":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("AP", have_num.innerText);
+                break;
+            case "APドリンク1/6":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("AP_half", have_num.innerText);
+                break;
+            case "BPドリンク":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("BP", have_num.innerText);
+                break;
+            case "BPドリンク1/5":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("BP_half", have_num.innerText);
+                break;
+            case "TPキャンディー":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("TP", have_num.innerText);
+                break;
+            case "TPキャンディー1/6":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("TP_half", have_num.innerText);
+                break;
+            case "CPブレッド":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("CP", have_num.innerText);
+                break;
+            case "CPブレッド1/6":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("CP_half", have_num.innerText);
+                break;
+            case "EPドリンク":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("EP", have_num.innerText);
+                break;
+            case "EPドリンク1/6":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("EP_half", have_num.innerText);
+                break;
+            case "SPゼリー":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("SP", have_num.innerText);
+                break;
+            case "SPゼリー1/6":
+                var t_num_selector = t_slector + ">span.pink";
+                var have_num = document.querySelector(t_num_selector);
+                event_item_checker("SP_half", have_num.innerText);
+                break;
         }
 
     }

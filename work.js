@@ -277,6 +277,7 @@ function chi_heal_checker()
                         この時、スタートタイムとの差が30分以上ある場合はlast_timeの時lenghtが30分以内のchi_healの回数になる。
                         この時30分以上であることを求める計算式は+分×1+時×60+日*60*2とする
                         月に変化があればその時点で計測は破棄とする（これ以上計算するとオーバーフローがありえるから）あと月末直後にスタ走りしている人がいないと思うのん
+
                         */
                         var start_time_num=Number(chi_heal_start[4])+Number(chi_heal_start[3])*60+Number(chi_heal_start[2])*3600;
 
