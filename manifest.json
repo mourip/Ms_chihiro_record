@@ -37,6 +37,13 @@
       "matches": ["http://sp.pf.mbga.jp/*"],
       "js": ["jquery-2.1.4.min.js", "event_top.js"],
       "run_at": "document_idle"
+    },
+    /*localhostは色々テストするためのもの*/
+    {
+
+      "matches": ["http://localhost/*"],
+      "js": ["jquery-2.1.4.min.js", "event_top.js"],
+      "run_at": "document_idle"
     }
   ]
 }
