@@ -94,7 +94,7 @@ function challenge_write(pt, pt_dif, rank, rank_dif) {
     // PRESISTENTで勝手に削除されないようにする
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-        fileSystem.root.getFile("event_items/challenge.txt", {
+        fileSystem.root.getFile("event/challenge.txt", {
             'create': true
         }, function(fileEntry) {
             fileEntry.createWriter(function(fileWriter) {
@@ -199,14 +199,16 @@ function challenge_log() {
     }
 
     var now_pt = pt;
-    var rank = document.querySelector("#top > section.t-Cnt > div:nth-child(3) > div > section > ul:nth-child(8) > li:nth-child(1)").innerText.split(" ")[2];
+    var rank = document.querySelector("#top > section.t-Cnt > div:nth-child(3) > div > section > ul:nth-child(8) > li:nth-child(1)").innerText.split(":")[1];
 
     // 位を削除する
     var now_rank_n = rank.substr(0, rank.length - 1);
+    console.log("event");
+
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
-            fs.root.getFile("event_result/challenge.txt", {
+            fs.root.getFile("event/challenge.txt", {
                 create: true
             }, function(fileEntry) {
                 fileEntry.file(function(file) {
@@ -240,7 +242,7 @@ function challenge_log() {
                                 //ポイントと順位のいずれかが違う場合は更新する
                                 if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
                                     console.log("更新します");
-                                    challenge_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(now_rank_n) - Number(last_rank));
+                                    challenge_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
                                 } else {
                                     console.log("更新しない");
                                 }
@@ -316,7 +318,7 @@ function fes_write(pt, pt_dif, rank, rank_dif) {
     // PRESISTENTで勝手に削除されないようにする
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-        fileSystem.root.getFile("event_items/fes.txt", {
+        fileSystem.root.getFile("event/fes.txt", {
             'create': true
         }, function(fileEntry) {
             fileEntry.createWriter(function(fileWriter) {
@@ -421,14 +423,14 @@ function fes_log() {
     }
 
     var now_pt = pt;
-    var rank = document.querySelector("#top > section.m-Btm5 > div.area_tab_2 > section > ul:nth-child(2) > li:nth-child(1)").innerText.split(" ")[2];
+    var rank = document.querySelector("#top > section.m-Btm5 > div.area_tab_2 > section > ul:nth-child(2) > li:nth-child(1)").innerText.split(":")[1];
 
     // 位を削除する
     var now_rank_n = rank.substr(0, rank.length - 1);
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
-            fs.root.getFile("event_result/fes.txt", {
+            fs.root.getFile("event/fes.txt", {
                 create: true
             }, function(fileEntry) {
                 fileEntry.file(function(file) {
@@ -438,7 +440,7 @@ function fes_log() {
                         // console.log(data);
                         if (!data) {
                             console.log("白紙なので、作成します");
-                            challenge_write(now_pt, 0, now_rank_n, 0);
+                            fes_write(now_pt, 0, now_rank_n, 0);
 
                         } else if (data) {
                             // データのすべてを得る
@@ -464,7 +466,7 @@ function fes_log() {
                                 //ポイントと順位のいずれかが違う場合は更新する
                                 if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
                                     console.log("更新します");
-                                    challenge_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(now_rank_n) - Number(last_rank));
+                                    challenge_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
                                 } else {
                                     console.log("更新しない");
                                 }
@@ -485,7 +487,7 @@ function fes_log() {
 //削除するための関数
 function delete_files(input_file) {
     // PRESISTENTで勝手に削除されないようにする
-    var txt_name = txt + ".txt";
+    var txt_name = input_file;
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
         fileSystem.root.getFile(txt_name, {
@@ -535,7 +537,7 @@ function copy_data_write(input_file, output_file, data) {
 function copy_data_read(input_file, output_file) {
     var txt_name = input_file
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
-        var txt_t = txt;
+        var txt_t = txt_name;
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             var txt_name1 = txt_t;
             // ファイル取得
@@ -652,7 +654,6 @@ function directry_root() {
 
 
 function event_checker() {
-
     /*
     イベントが何であるかを判定する
      */
@@ -663,6 +664,7 @@ function event_checker() {
 }
 
 
+console.log("test");
 
 directry_root();
 event_checker();
