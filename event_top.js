@@ -29,12 +29,23 @@ event_top.jsが提供する機能
 3.イベントトップページに保存されているアイテムの記録（実装予定）
  */
 
+/*
+イベント名
+チャレンジ:challenge
+フェス:fes
+ロワイヤル:royale
+ */
+
 
 /*
-各イベントでの修正点
-ヘッダーの日付はすべてのイベントで共通？
-ポイントのセレクターを修正する必要がある
-ファイル名の変更
+各イベントでの追加作業
+1.directory_rootにold_event/イベント名を追加
+2.event_checkerにイベントのidを追加
+3.イベント名_checker()を追加
+修正点はセレクター類
+記述するときの関数名の変更
+4.イベント名_writer()を追加
+修正点はファイル名だけ？（ここひとつの関数にまとめられそう）
  */
 
 
@@ -115,8 +126,6 @@ function challenge_write(pt, pt_dif, rank, rank_dif) {
                 fileWriter.seek(fileWriter.length);
                 //  出力行
                 var lines = '';
-
-
                 //  0バイトファイルの場合、ヘッダ行を作成する
                 if (fileWriter.length == 0) {
                     var headers = new Array("time", "pt", "pt_dif", "rank", "rank_dif");
@@ -146,9 +155,13 @@ function challenge_write(pt, pt_dif, rank, rank_dif) {
 }
 
 function challenge_log() {
-
+    //イベント開催の日程に関するヘッダーを確認する（なければ処理をトップじゃないので打ち切る）
+    if(document.querySelector("#event_header_info")==null){
+      return;
+    }
     //日付の処理
     var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
+
     var start_day = headers_text[1].split("/");
     var end_day = headers_text[2].split("～")[1].split("/");
     // 月と日を2桁の数に変換していく
@@ -241,7 +254,8 @@ function challenge_log() {
                             var first_line = array_temp[0];
                             if (first_line != start_end_day) {
                                 //出力ファイル名
-                                var output_file_name = String(start_day_m) + String(start_day_d) + ".txt";
+                                var file_start_d=first_line.split("~")[0];
+                                var output_file_name =  file_start_d+".txt";
                                 // コピー対象のファイルを読み込む
                                 copy_data_read("event/challenge.txt", "old_event/challenge/" + output_file_name);
                             } else {
@@ -268,8 +282,7 @@ function challenge_log() {
         });
     });
 
-    //ここからアイテムの記録に関する処理
-
+    //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(1)").innerText.split("×")[1];
     // console.log(normal_drink_num);
     var half_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(2)").innerText.split("×")[1];
@@ -377,9 +390,16 @@ function fes_write(pt, pt_dif, rank, rank_dif) {
             });
         });
     });
+
+
+
 }
 
 function fes_log() {
+    //イベント開催の日程に関するヘッダーを確認する（なければ処理をトップじゃないので打ち切る）
+    if(document.querySelector("#event_header_info")==null){
+        return;
+    }
     console.log("fesのログですね");
     //日付の処理
     var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
@@ -473,8 +493,9 @@ function fes_log() {
                             if (first_line != start_end_day) {
                                 // 旧データ群はold_resultに入れる
                                 console.log("古いデータなのでコピーする")
-                                    //出力ファイル名
-                                var output_file_name = String(start_day_m) + String(start_day_d) + ".txt";
+                                //出力ファイル名
+                                var file_start_d=first_line.split("~")[0];
+                                var output_file_name =  file_start_d+".txt";
                                 // コピー対象のファイルを読み込む
                                 copy_data_read("event/fes.txt", "old_event/fes/" + output_file_name);
                             } else {
@@ -500,11 +521,20 @@ function fes_log() {
             });
         });
     });
+
+    //ここからアイテムの記録に関する処理(セレクターを変更する)
+    var energy_num = document.querySelector("#top > section.event_main_graphic.pmf_top_bgArea > div.event_items > div:nth-child(2)").innerText.split("×")[1];
+    // console.log(normal_drink_num);
+    var my_energy_num = document.querySelector("#top > section.event_main_graphic.pmf_top_bgArea > div.event_items > div:nth-child(3)").innerText.split("×")[1];
+    var my_energy_half_num = document.querySelector("#top > section.event_main_graphic.pmf_top_bgArea > div.event_items > div:nth-child(4)").innerText.split("×")[1];
+    // console.log(half_drink_num);
+    item_checker("item/energy.txt", energy_num);
+    item_checker("item/my_energy.txt", my_energy_num);
+    item_checker("item/my_energy_half.txt", my_energy_half_num);
 }
 
 
-/*以下3つの関数はすべてのイベントで共通の処理を行う*/
-
+/*以下5つの関数はすべてのイベントで共通の処理を行う*/
 //削除するための関数
 function delete_files(input_file) {
     // PRESISTENTで勝手に削除されないようにする
@@ -765,6 +795,22 @@ function directry_root() {
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             fs.root.getDirectory("event_item", {
+                    create: true
+                },
+                function(dirEntry) {
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("item", {
                     create: true
                 },
                 function(dirEntry) {
