@@ -23,6 +23,14 @@ SOFTWARE.
 */
 
 /*
+event_top.jsが提供する機能
+1.イベントトップページにあるポイントと順位の記録
+2.古いイベントは各old_resultに保存
+3.イベントトップページに保存されているアイテムの記録（実装予定）
+ */
+
+
+/*
 各イベントでの修正点
 ヘッダーの日付はすべてのイベントで共通？
 ポイントのセレクターを修正する必要がある
@@ -32,9 +40,13 @@ SOFTWARE.
 
 //ファイルの書式
 //日付　ポイント　その差　順位　その差//日付の書式4桁~4桁とする（あとでファイルの処理がやりやすい）
-//（次の年に同じイベントが来ることは想定していない）
+
+//注意点
+//次の年に同じイベントが来ることは想定していないためold_resultのファイルの日程がかぶる可能性がある（アニバーサリーについてはそのとき考える）
 
 
+
+/*チャレに関する関数*/
 function challenge_write(pt, pt_dif, rank, rank_dif) {
 
     // 現在の日付の取得
@@ -214,8 +226,9 @@ function challenge_log() {
                 fileEntry.file(function(file) {
                     var reader = new FileReader();
                     reader.onloadend = function(e) {
+
                         data = e.target.result;
-                        // console.log(data);
+                        console.log(fileEntry.toURL());
                         if (!data) {
                             console.log("白紙なので、作成します");
                             challenge_write(now_pt, 0, now_rank_n, 0);
@@ -254,11 +267,20 @@ function challenge_log() {
             });
         });
     });
+
+    //ここからアイテムの記録に関する処理
+
+    var normal_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(1)").innerText.split("×")[1];
+    // console.log(normal_drink_num);
+    var half_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(2)").innerText.split("×")[1];
+    // console.log(half_drink_num);
+    item_checker("event_item/CP.txt", normal_drink_num);
+    item_checker("event_item/CP_half.txt", half_drink_num);
 }
 
 
 
-
+/*フェスに関する関数*/
 function fes_write(pt, pt_dif, rank, rank_dif) {
 
     // 現在の日付の取得
@@ -358,7 +380,7 @@ function fes_write(pt, pt_dif, rank, rank_dif) {
 }
 
 function fes_log() {
-
+    console.log("fesのログですね");
     //日付の処理
     var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
     var start_day = headers_text[1].split("/");
@@ -451,10 +473,10 @@ function fes_log() {
                             if (first_line != start_end_day) {
                                 // 旧データ群はold_resultに入れる
                                 console.log("古いデータなのでコピーする")
-                                //出力ファイル名
+                                    //出力ファイル名
                                 var output_file_name = String(start_day_m) + String(start_day_d) + ".txt";
                                 // コピー対象のファイルを読み込む
-                                copy_data_read("event/challenge.txt", "old_event/fes/" + output_file_name);
+                                copy_data_read("event/fes.txt", "old_event/fes/" + output_file_name);
                             } else {
                                 //最後の行をみて書くかどうかを判断する
                                 //最後のポイントを取得する
@@ -466,7 +488,7 @@ function fes_log() {
                                 //ポイントと順位のいずれかが違う場合は更新する
                                 if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
                                     console.log("更新します");
-                                    challenge_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
+                                    fes_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
                                 } else {
                                     console.log("更新しない");
                                 }
@@ -481,9 +503,8 @@ function fes_log() {
 }
 
 
-
-
 /*以下3つの関数はすべてのイベントで共通の処理を行う*/
+
 //削除するための関数
 function delete_files(input_file) {
     // PRESISTENTで勝手に削除されないようにする
@@ -499,6 +520,7 @@ function delete_files(input_file) {
         });
     });
 }
+
 // コピーしたデータを書き込む処理
 function copy_data_write(input_file, output_file, data) {
     // console.log(data);
@@ -533,6 +555,7 @@ function copy_data_write(input_file, output_file, data) {
     });
     delete_files(input_file);
 }
+
 //コピーしたいデータを読み込むための処理
 function copy_data_read(input_file, output_file) {
     var txt_name = input_file
@@ -564,6 +587,110 @@ function copy_data_read(input_file, output_file) {
     });
 
 }
+
+//アイテムデータを読み込む関数
+function item_checker(filename, drink_num) {
+  console.log(filename+"確認");
+  navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+      window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+          // ファイル取得
+          fs.root.getFile(filename, {
+              create: true
+          }, function(fileEntry) {
+              fileEntry.file(function(file) {
+                  var reader = new FileReader();
+                  reader.onloadend = function(e) {
+                      data = e.target.result;
+                      // console.log(data);
+                      if (!data) {
+                          console.log("白紙なので、作成します")
+                          item_writer(filename, drink_num, 0);
+                      } else if (data) {
+                          var array_temp = data.split("\n");
+                          var last_item_num = array_temp[array_temp.length - 2].split(",")[1];
+                          console.log(last_item_num);
+
+                          //ここからアップデートが必要かを判断する関数に飛ばす
+                          if (String(last_item_num) != String(drink_num)) {
+                              console.log("更新します");
+                              item_writer(filename, Number(drink_num), Number(drink_num) - Number(last_item_num));
+                          } else {
+                              console.log("更新しない");
+                          }
+                      }
+                  };
+                  reader.readAsText(file);
+              });
+          });
+      });
+  });
+}
+
+//アイテムを記録するための関数
+function item_writer(filename, drink_num, drink_dif) {
+    console.log(filename+"記述");
+    var num=drink_num;
+    var dif=drink_dif;
+    var DD = new Date();
+    var Year = DD.getYear() + 1900;
+    var Month = DD.getMonth() + 1;
+    var Day = DD.getDate();
+    var Hours = DD.getHours();
+    var Minutes = DD.getMinutes();
+    var Seconds = DD.getSeconds();
+    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
+    var dates = date.join("/");
+    // console.log(dates);
+    var utf8num = unescape(encodeURIComponent(num));
+    var utf8dif = unescape(encodeURIComponent(dif));
+
+    var txt_name =filename;
+    var header_kind=filename.split("/")[1].split(".")[0];
+        // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024*5, function(fileSystem) {
+
+        fileSystem.root.getFile(txt_name, {
+            'create': true
+        }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
+
+                //  ファイルの書き込み位置は、一番最後とする
+                fileWriter.seek(fileWriter.length);
+                //  出力行
+                var lines = '';
+
+
+                //  0バイトファイルの場合、ヘッダ行を作成する
+                if (fileWriter.length == 0) {
+                    var headers = new Array("time", header_kind, "difference");
+                    lines = headers.join(",") + "\n";
+
+                }
+
+                //  データ行の作成
+
+                var details = new Array(dates, utf8num, utf8dif);
+                lines += details.join(",") + "\n";
+                var blob = new Blob([lines], {
+                    type: 'text/plain'
+                });
+
+                fileWriter.write(blob);
+
+
+                fileWriter.onwriteend = function(e) {
+                    console.log(txt_name + 'Write completed.');
+                };
+
+                fileWriter.onerror = function(e) {
+                    console.log('Write failed: ' + e.toString());
+                };
+
+            });
+        });
+    });
+}
+
 
 
 //ディレクトリを作成するための関数
@@ -635,6 +762,22 @@ function directry_root() {
                 });
         });
     });
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("event_item", {
+                    create: true
+                },
+                function(dirEntry) {
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
 
 
 
@@ -651,15 +794,12 @@ function directry_root() {
 
 
 }
-
-
+// イベントが何であるかを判定する関数
 function event_checker() {
-    /*
-    イベントが何であるかを判定する
-     */
-    if (document.querySelector("#event_challenge"))
+
+    if (document.querySelector("#event_challenge") != null)
         challenge_log();
-    else if (document.querySelector("#event_pmf"))
+    else if (document.querySelector("#event_pmf") != null)
         fes_log();
 }
 
