@@ -1,6 +1,6 @@
 {
   "name": "ちひろさんの記録簿",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "manifest_version": 2,
   "description": "お疲れ様です！今日もプロデューサーさんのお手伝いしますね",
   "permissions": [
@@ -32,7 +32,18 @@
       "matches": ["http://sp.mbga.jp/_pf_pay_confirm*"],
       "js": ["jquery-2.1.4.min.js", "kakin.js"],
       "run_at": "document_idle"
-    }
+    },
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js", "event_top.js"],
+      "run_at": "document_idle"
+    },
+    /*localhostは色々テストするためのもの*/
+    {
 
+      "matches": ["http://localhost/*"],
+      "js": ["jquery-2.1.4.min.js", "event_top.js"],
+      "run_at": "document_idle"
+    }
   ]
 }

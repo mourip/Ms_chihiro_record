@@ -141,11 +141,12 @@ function kakin()
   */
   var test=document.querySelector("body > div.iTextbox_bg.iTextbox_bg_open > dl > dd:nth-child(15)");
   var moba=test.innerText.split(" ")[0];
+  console.log(moba);
   moba_checker(moba);
-  localStorage["test"]="hoge";
-  console.log(localStorage["keya"]);
+
 }
 
+// body > div.iTextbox_bg.iTextbox_bg_open > dl > dd:nth-child(15)
 
 
 
