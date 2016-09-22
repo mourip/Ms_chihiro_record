@@ -41,11 +41,8 @@ event_top.jsが提供する機能
 各イベントでの追加作業
 1.directory_rootにold_event/イベント名を追加
 2.event_checkerにイベントのidを追加
-3.イベント名_checker()を追加
+3.イベント名_log()を追加
 修正点はセレクター類
-記述するときの関数名の変更
-4.イベント名_writer()を追加
-修正点はファイル名だけ？（ここひとつの関数にまとめられそう）
  */
 
 
@@ -58,146 +55,8 @@ event_top.jsが提供する機能
 
 
 /*チャレに関する関数*/
-function challenge_write(pt, pt_dif, rank, rank_dif) {
-
-    // 現在の日付の取得
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
-    // console.log(dates);
-    var utf8pt = unescape(encodeURIComponent(pt));
-    var utf8pt_dif = unescape(encodeURIComponent(pt_dif));
-    var utf8rank = unescape(encodeURIComponent(rank));
-    var utf8rank_dif = unescape(encodeURIComponent(rank_dif));
-
-    //ヘッダー行のからのイベント期間の取得
-    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
-    var start_day = headers_text[1].split("/");
-    var end_day = headers_text[2].split("～")[1].split("/");
-    // 月と日を2桁の数に変換していく
-
-    // 1スタートの月の変換
-    var start_day_m = "";
-    if (Number(start_day[0]) < 10) {
-        start_day_m = "0" + start_day[0];
-    } else {
-        start_day_m = start_day[0];
-    }
-    // 2スタートの日の変換
-    var start_day_d = ""
-    if (Number(start_day[1]) < 10) {
-        start_day_d = "0" + start_day[1];
-    } else {
-        start_day_d = start_day[1];
-    }
-
-    // 3エンドの月の変換
-    var end_day_m = "";
-    if (Number(end_day[0]) < 10) {
-        end_day_m = "0" + end_day[0];
-    } else {
-        end_day_m = end_day[0];
-    }
-    // 4エンドの日の変換
-    var end_day_d = ""
-    if (Number(end_day[1]) < 10) {
-        end_day_d = "0" + end_day[1];
-    } else {
-        end_day_d = end_day[1];
-    }
-
-    var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
-
-    // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
-
-        fileSystem.root.getFile("event/challenge.txt", {
-            'create': true
-        }, function(fileEntry) {
-            fileEntry.createWriter(function(fileWriter) {
-
-                //  ファイルの書き込み位置は、一番最後とする
-                fileWriter.seek(fileWriter.length);
-                //  出力行
-                var lines = '';
-                //  0バイトファイルの場合、ヘッダ行を作成する
-                if (fileWriter.length == 0) {
-                    var headers = new Array("time", "pt", "pt_dif", "rank", "rank_dif");
-                    lines = start_end_day + "\n" + headers.join(",") + "\n";
-
-                }
-
-                //  データ行の作成
-
-                var details = new Array(dates, utf8pt, utf8pt_dif, utf8rank, utf8rank_dif);
-                lines += details.join(",") + "\n";
-                var blob = new Blob([lines], {
-                    type: 'text/plain'
-                });
-                fileWriter.write(blob);
-                fileWriter.onwriteend = function(e) {
-                    console.log('Write completed.');
-                };
-
-                fileWriter.onerror = function(e) {
-                    console.log('Write failed: ' + e.toString());
-                };
-
-            });
-        });
-    });
-}
 
 function challenge_log() {
-    //イベント開催の日程に関するヘッダーを確認する（なければ処理をトップじゃないので打ち切る）
-    if(document.querySelector("#event_header_info")==null){
-      return;
-    }
-    //日付の処理
-    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
-
-    var start_day = headers_text[1].split("/");
-    var end_day = headers_text[2].split("～")[1].split("/");
-    // 月と日を2桁の数に変換していく
-
-    // 1スタートの月の変換
-    var start_day_m = "";
-    if (Number(start_day[0]) < 10) {
-        start_day_m = "0" + start_day[0];
-    } else {
-        start_day_m = start_day[0];
-    }
-    // 2スタートの日の変換
-    var start_day_d = ""
-    if (Number(start_day[1]) < 10) {
-        start_day_d = "0" + start_day[1];
-    } else {
-        start_day_d = start_day[1];
-    }
-
-    // 3エンドの月の変換
-    var end_day_m = "";
-    if (Number(end_day[0]) < 10) {
-        end_day_m = "0" + end_day[0];
-    } else {
-        end_day_m = end_day[0];
-    }
-    // 4エンドの日の変換
-    var end_day_d = ""
-    if (Number(end_day[1]) < 10) {
-        end_day_d = "0" + end_day[1];
-    } else {
-        end_day_d = end_day[1];
-    }
-
-    var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
-
 
 
     //現在のポイントの処理を行う
@@ -228,59 +87,8 @@ function challenge_log() {
 
     // 位を削除する
     var now_rank_n = rank.substr(0, rank.length - 1);
-    console.log("event");
 
-    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
-        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-            // ファイル取得
-            fs.root.getFile("event/challenge.txt", {
-                create: true
-            }, function(fileEntry) {
-                fileEntry.file(function(file) {
-                    var reader = new FileReader();
-                    reader.onloadend = function(e) {
-
-                        data = e.target.result;
-                        console.log(fileEntry.toURL());
-                        if (!data) {
-                            console.log("白紙なので、作成します");
-                            challenge_write(now_pt, 0, now_rank_n, 0);
-
-                        } else if (data) {
-                            // データのすべてを得る
-
-                            var array_temp = data.split("\n");
-                            // 最初の行にある日付と今のイベントの日付が一致しない場合はファイルのコピーを行う
-                            var first_line = array_temp[0];
-                            if (first_line != start_end_day) {
-                                //出力ファイル名
-                                var file_start_d=first_line.split("~")[0];
-                                var output_file_name =  file_start_d+".txt";
-                                // コピー対象のファイルを読み込む
-                                copy_data_read("event/challenge.txt", "old_event/challenge/" + output_file_name);
-                            } else {
-                                //最後の行をみて書くかどうかを判断する
-                                //最後のポイントを取得する
-                                var last_pt = array_temp[array_temp.length - 2].split(",")[1];
-                                //最後の順位を取得する
-                                var last_rank = array_temp[array_temp.length - 2].split(",")[3];
-                                // console.log(last_item_num+","+last_half_drink);
-
-                                //ポイントと順位のいずれかが違う場合は更新する
-                                if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
-                                    console.log("更新します");
-                                    challenge_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
-                                } else {
-                                    console.log("更新しない");
-                                }
-                            }
-                        }
-                    };
-                    reader.readAsText(file);
-                });
-            });
-        });
-    });
+    pt_checker("event/challenge.txt",now_pt,now_rank_n);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(1)").innerText.split("×")[1];
@@ -291,154 +99,11 @@ function challenge_log() {
     item_checker("event_item/CP_half.txt", half_drink_num);
 }
 
-
-
 /*フェスに関する関数*/
-function fes_write(pt, pt_dif, rank, rank_dif) {
-
-    // 現在の日付の取得
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
-    // console.log(dates);
-    var utf8pt = unescape(encodeURIComponent(pt));
-    var utf8pt_dif = unescape(encodeURIComponent(pt_dif));
-    var utf8rank = unescape(encodeURIComponent(rank));
-    var utf8rank_dif = unescape(encodeURIComponent(rank_dif));
-
-    //ヘッダー行のからのイベント期間の取得
-    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
-    var start_day = headers_text[1].split("/");
-    var end_day = headers_text[2].split("～")[1].split("/");
-    // 月と日を2桁の数に変換していく
-
-    // 1スタートの月の変換
-    var start_day_m = "";
-    if (Number(start_day[0]) < 10) {
-        start_day_m = "0" + start_day[0];
-    } else {
-        start_day_m = start_day[0];
-    }
-    // 2スタートの日の変換
-    var start_day_d = ""
-    if (Number(start_day[1]) < 10) {
-        start_day_d = "0" + start_day[1];
-    } else {
-        start_day_d = start_day[1];
-    }
-
-    // 3エンドの月の変換
-    var end_day_m = "";
-    if (Number(end_day[0]) < 10) {
-        end_day_m = "0" + end_day[0];
-    } else {
-        end_day_m = end_day[0];
-    }
-    // 4エンドの日の変換
-    var end_day_d = ""
-    if (Number(end_day[1]) < 10) {
-        end_day_d = "0" + end_day[1];
-    } else {
-        end_day_d = end_day[1];
-    }
-
-    var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
-
-    // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
-
-        fileSystem.root.getFile("event/fes.txt", {
-            'create': true
-        }, function(fileEntry) {
-            fileEntry.createWriter(function(fileWriter) {
-
-                //  ファイルの書き込み位置は、一番最後とする
-                fileWriter.seek(fileWriter.length);
-                //  出力行
-                var lines = '';
-
-
-                //  0バイトファイルの場合、ヘッダ行を作成する
-                if (fileWriter.length == 0) {
-                    var headers = new Array("time", "pt", "pt_dif", "rank", "rank_dif");
-                    lines = start_end_day + "\n" + headers.join(",") + "\n";
-
-                }
-
-                //  データ行の作成
-
-                var details = new Array(dates, utf8pt, utf8pt_dif, utf8rank, utf8rank_dif);
-                lines += details.join(",") + "\n";
-                var blob = new Blob([lines], {
-                    type: 'text/plain'
-                });
-                fileWriter.write(blob);
-                fileWriter.onwriteend = function(e) {
-                    console.log('Write completed.');
-                };
-
-                fileWriter.onerror = function(e) {
-                    console.log('Write failed: ' + e.toString());
-                };
-
-            });
-        });
-    });
-
-
-
-}
 
 function fes_log() {
-    //イベント開催の日程に関するヘッダーを確認する（なければ処理をトップじゃないので打ち切る）
-    if(document.querySelector("#event_header_info")==null){
-        return;
-    }
+
     console.log("fesのログですね");
-    //日付の処理
-    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
-    var start_day = headers_text[1].split("/");
-    var end_day = headers_text[2].split("～")[1].split("/");
-    // 月と日を2桁の数に変換していく
-
-    // 1スタートの月の変換
-    var start_day_m = "";
-    if (Number(start_day[0]) < 10) {
-        start_day_m = "0" + start_day[0];
-    } else {
-        start_day_m = start_day[0];
-    }
-    // 2スタートの日の変換
-    var start_day_d = ""
-    if (Number(start_day[1]) < 10) {
-        start_day_d = "0" + start_day[1];
-    } else {
-        start_day_d = start_day[1];
-    }
-
-    // 3エンドの月の変換
-    var end_day_m = "";
-    if (Number(end_day[0]) < 10) {
-        end_day_m = "0" + end_day[0];
-    } else {
-        end_day_m = end_day[0];
-    }
-    // 4エンドの日の変換
-    var end_day_d = ""
-    if (Number(end_day[1]) < 10) {
-        end_day_d = "0" + end_day[1];
-    } else {
-        end_day_d = end_day[1];
-    }
-
-    var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
-
 
 
     //現在のポイントの処理を行う
@@ -469,58 +134,9 @@ function fes_log() {
 
     // 位を削除する
     var now_rank_n = rank.substr(0, rank.length - 1);
-    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
-        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-            // ファイル取得
-            fs.root.getFile("event/fes.txt", {
-                create: true
-            }, function(fileEntry) {
-                fileEntry.file(function(file) {
-                    var reader = new FileReader();
-                    reader.onloadend = function(e) {
-                        data = e.target.result;
-                        // console.log(data);
-                        if (!data) {
-                            console.log("白紙なので、作成します");
-                            fes_write(now_pt, 0, now_rank_n, 0);
 
-                        } else if (data) {
-                            // データのすべてを得る
-
-                            var array_temp = data.split("\n");
-                            // 最初の行にある日付と今のイベントの日付が一致しない場合はファイルのコピーを行う
-                            var first_line = array_temp[0];
-                            if (first_line != start_end_day) {
-                                // 旧データ群はold_resultに入れる
-                                console.log("古いデータなのでコピーする")
-                                //出力ファイル名
-                                var file_start_d=first_line.split("~")[0];
-                                var output_file_name =  file_start_d+".txt";
-                                // コピー対象のファイルを読み込む
-                                copy_data_read("event/fes.txt", "old_event/fes/" + output_file_name);
-                            } else {
-                                //最後の行をみて書くかどうかを判断する
-                                //最後のポイントを取得する
-                                var last_pt = array_temp[array_temp.length - 2].split(",")[1];
-                                //最後の順位を取得する
-                                var last_rank = array_temp[array_temp.length - 2].split(",")[3];
-                                // console.log(last_item_num+","+last_half_drink);
-
-                                //ポイントと順位のいずれかが違う場合は更新する
-                                if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
-                                    console.log("更新します");
-                                    fes_write(now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
-                                } else {
-                                    console.log("更新しない");
-                                }
-                            }
-                        }
-                    };
-                    reader.readAsText(file);
-                });
-            });
-        });
-    });
+    //ポイントに関して記述することを想定する
+    pt_checker("event/fes.txt",now_pt,now_rank_n);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var energy_num = document.querySelector("#top > section.event_main_graphic.pmf_top_bgArea > div.event_items > div:nth-child(2)").innerText.split("×")[1];
@@ -724,7 +340,7 @@ function item_writer(filename, drink_num, drink_dif) {
 // ポイントを読み込むための関数
 function pt_checker(filename,now_pt,now_rank_n){
     var start_end_day=header_to_date();
-    console.log(start_end_day);
+    console.log(filename+"確認");
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
@@ -737,7 +353,7 @@ function pt_checker(filename,now_pt,now_rank_n){
                         data = e.target.result;
                         // console.log(data);
                         if (!data) {
-                            console.log("白紙なので、作成します");
+                            console.log(filename+":白紙なので、作成します");
                             pt_write(filename,now_pt, 0, now_rank_n, 0);
 
                         } else if (data) {
@@ -748,7 +364,7 @@ function pt_checker(filename,now_pt,now_rank_n){
                             var first_line = array_temp[0];
                             if (first_line != start_end_day) {
                                 // 旧データ群はold_resultに入れる
-                                console.log("古いデータなのでコピーする")
+                                console.log(filename+":古いデータなのでコピーする")
                                 //出力ファイル名
                                 var file_start_d=first_line.split("~")[0];
                                 var output_file_name =  file_start_d+".txt";
@@ -757,7 +373,7 @@ function pt_checker(filename,now_pt,now_rank_n){
                                 var event_name=filename.split("/")[1].split(".")[0];
                                 output_file="old_event/"+event_name+"/"+output_file_name;
                                 // コピー対象のファイルを読み込む
-                                copy_data_read(filename, "old_event/fes/" + output_file_name);
+                                copy_data_read(filename, output_file);
                             } else {
                                 //最後の行をみて書くかどうかを判断する
                                 //最後のポイントを取得する
@@ -768,7 +384,7 @@ function pt_checker(filename,now_pt,now_rank_n){
 
                                 //ポイントと順位のいずれかが違う場合は更新する
                                 if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
-                                    console.log("更新します");
+                                    console.log(filename+":更新します");
                                     pt_write(filename,now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
                                 } else {
                                     console.log("更新しない");
