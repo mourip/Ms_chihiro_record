@@ -721,6 +721,172 @@ function item_writer(filename, drink_num, drink_dif) {
     });
 }
 
+// ポイントを読み込むための関数
+function pt_checker(filename,now_pt,now_rank_n){
+    var start_end_day=header_to_date();
+    console.log(start_end_day);
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            // ファイル取得
+            fs.root.getFile(filename, {
+                create: true
+            }, function(fileEntry) {
+                fileEntry.file(function(file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function(e) {
+                        data = e.target.result;
+                        // console.log(data);
+                        if (!data) {
+                            console.log("白紙なので、作成します");
+                            pt_write(filename,now_pt, 0, now_rank_n, 0);
+
+                        } else if (data) {
+                            // データのすべてを得る
+
+                            var array_temp = data.split("\n");
+                            // 最初の行にある日付と今のイベントの日付が一致しない場合はファイルのコピーを行う
+                            var first_line = array_temp[0];
+                            if (first_line != start_end_day) {
+                                // 旧データ群はold_resultに入れる
+                                console.log("古いデータなのでコピーする")
+                                //出力ファイル名
+                                var file_start_d=first_line.split("~")[0];
+                                var output_file_name =  file_start_d+".txt";
+                                // 現在のファイル名からイベント名を取得する
+                                // event/fes.txt
+                                var event_name=filename.split("/")[1].split(".")[0];
+                                output_file="old_event/"+event_name+"/"+output_file_name;
+                                // コピー対象のファイルを読み込む
+                                copy_data_read(filename, "old_event/fes/" + output_file_name);
+                            } else {
+                                //最後の行をみて書くかどうかを判断する
+                                //最後のポイントを取得する
+                                var last_pt = array_temp[array_temp.length - 2].split(",")[1];
+                                //最後の順位を取得する
+                                var last_rank = array_temp[array_temp.length - 2].split(",")[3];
+                                // console.log(last_item_num+","+last_half_drink);
+
+                                //ポイントと順位のいずれかが違う場合は更新する
+                                if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
+                                    console.log("更新します");
+                                    pt_write(filename,now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
+                                } else {
+                                    console.log("更新しない");
+                                }
+                            }
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            });
+        });
+    });
+}
+
+// ポイントを記録するための関数
+function pt_write(filename,pt,pt_dif,rank,rank_dif){
+
+    // 現在の日付の取得
+    var DD = new Date();
+    var Year = DD.getYear() + 1900;
+    var Month = DD.getMonth() + 1;
+    var Day = DD.getDate();
+    var Hours = DD.getHours();
+    var Minutes = DD.getMinutes();
+    var Seconds = DD.getSeconds();
+    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
+    var dates = date.join("/");
+    // console.log(dates);
+    var utf8pt = unescape(encodeURIComponent(pt));
+    var utf8pt_dif = unescape(encodeURIComponent(pt_dif));
+    var utf8rank = unescape(encodeURIComponent(rank));
+    var utf8rank_dif = unescape(encodeURIComponent(rank_dif));
+
+    //ヘッダー行のからのイベント期間の取得
+    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
+    var start_day = headers_text[1].split("/");
+    var end_day = headers_text[2].split("～")[1].split("/");
+
+    var start_end_day = header_to_date();
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
+
+        fileSystem.root.getFile(filename, {'create': true},function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
+
+                //  ファイルの書き込み位置は、一番最後とする
+                fileWriter.seek(fileWriter.length);
+                //  出力行
+                var lines = '';
+                //  0バイトファイルの場合、ヘッダ行を作成する
+                if (fileWriter.length == 0) {
+                    var headers = new Array("time", "pt", "pt_dif", "rank", "rank_dif");
+                    lines = start_end_day + "\n" + headers.join(",") + "\n";
+
+                }
+
+                //  データ行の作成
+
+                var details = new Array(dates, utf8pt, utf8pt_dif, utf8rank, utf8rank_dif);
+                lines += details.join(",") + "\n";
+                var blob = new Blob([lines], {
+                    type: 'text/plain'
+                });
+                fileWriter.write(blob);
+                fileWriter.onwriteend = function(e) {
+                    console.log('Write completed.');
+                };
+
+                fileWriter.onerror = function(e) {
+                    console.log('Write failed: ' + e.toString());
+                };
+
+            });
+        });
+    });
+}
+
+//ヘッダーから日付を得るための関数
+function header_to_date(){
+    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
+    var start_day = headers_text[1].split("/");
+    var end_day = headers_text[2].split("～")[1].split("/");
+    // 月と日を2桁の数に変換していく
+
+    // 1スタートの月の変換
+    var start_day_m = "";
+    if (Number(start_day[0]) < 10) {
+        start_day_m = "0" + start_day[0];
+    } else {
+        start_day_m = start_day[0];
+    }
+    // 2スタートの日の変換
+    var start_day_d = ""
+    if (Number(start_day[1]) < 10) {
+        start_day_d = "0" + start_day[1];
+    } else {
+        start_day_d = start_day[1];
+    }
+
+    // 3エンドの月の変換
+    var end_day_m = "";
+    if (Number(end_day[0]) < 10) {
+        end_day_m = "0" + end_day[0];
+    } else {
+        end_day_m = end_day[0];
+    }
+    // 4エンドの日の変換
+    var end_day_d = ""
+    if (Number(end_day[1]) < 10) {
+        end_day_d = "0" + end_day[1];
+    } else {
+        end_day_d = end_day[1];
+    }
+
+    var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
+    return start_end_day;
+}
+
 
 
 //ディレクトリを作成するための関数
@@ -838,7 +1004,6 @@ function directry_root() {
     }
     */
 
-
 }
 // イベントが何であるかを判定する関数
 function event_checker() {
@@ -850,7 +1015,8 @@ function event_checker() {
 }
 
 
-console.log("test");
-
-directry_root();
-event_checker();
+//トップページのみ動作する
+if(document.querySelector("#event_header_info")!=null){
+    directry_root();
+    event_checker();
+}
