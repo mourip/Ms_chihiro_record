@@ -5,7 +5,8 @@
   "description": "お疲れ様です！今日もプロデューサーさんのお手伝いしますね",
   "permissions": [
    "storage",
-   "unlimitedStorage"
+   "unlimitedStorage",
+   "notifications"
  ],
 
   "content_scripts": [
@@ -36,6 +37,11 @@
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
       "js": ["jquery-2.1.4.min.js", "event_top.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js", "work_ctrl.js"],
       "run_at": "document_idle"
     },
     /*localhostは色々テストするためのもの*/
