@@ -52,7 +52,68 @@ event_top.jsが提供する機能
 //注意点
 //次の年に同じイベントが来ることは想定していないためold_resultのファイルの日程がかぶる可能性がある（アニバーサリーについてはそのとき考える）
 
+function commma_delete(pt_str){
+    var pt="";
+    if (isNaN(pt_str)) //,が含まれている時はNAN(Not a Number)として判定される
+    {
+        var pt_array = pt_str.split(",");
+        for (var i = 0; i < pt_array.length; i++) {
+            pt += String(pt_array[i]);
+        }
 
+    } else //,が含まれいないときはこっち
+    {
+        pt = pt_str;
+    }
+
+    return pt;
+}
+
+
+// ドリフに関する関数
+function dream_log(){
+    //現在のポイントの処理を行う
+    //総合ポイントのセレクタ-。これは毎回変える必要があると思う
+    // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
+    var pt_selector = document.querySelector("#tab_01 > div.area_tab_2.t-Cnt > section > ul:nth-child(2) > li:nth-child(2)");
+
+    //,区切りが嫌であるのでなんとかして変更する
+    var pt_str = pt_selector.innerText.split(" ")[2]
+    var pt = "";
+    // console.log(pt_str);
+    if (pt_selector) {
+        if (isNaN(pt_str)) //,が含まれている時はNAN(Not a Number)として判定される
+        {
+            var pt_array = pt_str.split(",");
+            for (var i = 0; i < pt_array.length; i++) {
+                pt += String(pt_array[i]);
+            }
+
+        } else //,が含まれいないときはこっち
+        {
+            pt = pt_str;
+        }
+    }
+
+    var now_pt = pt;
+    var rank = document.querySelector("#tab_01 > div.area_tab_2.t-Cnt > section > ul:nth-child(2) > li:nth-child(1)").innerText.split(":")[1];
+
+    // 位を削除する
+    var now_rank_n = rank.substr(0, rank.length - 1);
+
+    // 順位も,がドリフ？では入るので削除する。ついでに関数化
+    var now_rank_nn=commma_delete(now_rank_n);
+
+    pt_checker("event/dream.txt",now_pt,now_rank_nn);
+
+    //ここからアイテムの記録に関する処理(セレクターを変更する)
+    var normal_drink_num = document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(1)").innerText.split("×")[1];
+    // console.log(normal_drink_num);
+    var half_drink_num = document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(2)").innerText.split("×")[1];
+    // console.log(half_drink_num);
+    item_checker("event_item/AP.txt", normal_drink_num);
+    item_checker("event_item/AP_half.txt", half_drink_num);
+}
 
 /*チャレに関する関数*/
 function challenge_log() {
@@ -651,6 +712,39 @@ function directry_root() {
         });
     });
 
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("old_event/dream", {
+                    create: true
+                },
+                function(dirEntry) {
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
+
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("old_event/fes", {
+                    create: true
+                },
+                function(dirEntry) {
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
 
 
 
@@ -674,6 +768,9 @@ function event_checker() {
         fes_log();
     else if(document.querySelector("#event_royale")!=null)
         royale_log();
+    else if(document.querySelector("#event_dream") != null)
+        dream_log();
+
 }
 
 

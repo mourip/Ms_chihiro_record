@@ -1,11 +1,12 @@
 {
   "name": "ちひろさんの記録簿",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "manifest_version": 2,
   "description": "お疲れ様です！今日もプロデューサーさんのお手伝いしますね",
   "permissions": [
    "storage",
-   "unlimitedStorage"
+   "unlimitedStorage",
+   "notifications"
  ],
 
   "content_scripts": [
@@ -16,11 +17,6 @@
       "run_at": "document_idle"
     },
 
-    {
-      "matches": ["http://sp.pf.mbga.jp/*"],
-      "js": ["jquery-2.1.4.min.js", "kisei.js"],
-      "run_at": "document_idle"
-    },
 
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
@@ -38,12 +34,11 @@
       "js": ["jquery-2.1.4.min.js", "event_top.js"],
       "run_at": "document_idle"
     },
-    /*localhostは色々テストするためのもの*/
     {
-
-      "matches": ["http://localhost/*"],
-      "js": ["jquery-2.1.4.min.js", "event_top.js"],
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js", "work_ctrl.js"],
       "run_at": "document_idle"
     }
+
   ]
 }
