@@ -45,6 +45,42 @@ BP #bp_mic
 累計回数
 */
 
+// 30分のチヒールを記録する処理
+function chi_heal_30(now_p){
+    // ストレージの種類
+    // 時刻　前のp　累計p
+
+    // スタート時刻の取得　30分経っているか確認　経っていたら回数を通知して削除
+    // スタート時刻の取得　30分経っていなかった場合　回数を増やすか確認して増えていたら増加する
+    // そもそもkeyが存在していない場合は全部登録する
+
+    chrome.storage.local.get("start_30m_time", function (value) {
+        if(value.key!="undefined"){
+
+        }
+    });
+
+
+}
+
+//alart音を鳴らす
+function work_alert(){
+    var n = new Notification("全回復してますよ\nライブしてくださいね！");
+    var audioCtx = new AudioContext;
+    // sine
+    var oscillator = audioCtx.createOscillator();
+    oscillator.connect( audioCtx.destination );
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 1000;
+
+    var soundLength = 0.3;
+    oscillator.start();
+    oscillator.stop( audioCtx.currentTime + soundLength );
+
+    //通知は3000ミリ秒表示する
+    setTimeout(n.close.bind(n), 3000);
+}
+
 // ロワに関する関数
 function royale_log(){
     /*
@@ -59,22 +95,26 @@ function royale_log(){
     var now_bp=document.querySelector("#bp_mic").innerText.split(" ")[2];
     var max_bp=document.querySelector("#bp_mic").innerText.split(" ")[4];
 
-    /*BPが等しいならなら通知+警告音の再生を行う*/
-    if(now_bp==max_bp){
-        var n = new Notification("BP回復してますよ\nライブしてくださいね！");
+    /*
+    記録取るべきこと
+    30分間の規制回数
+    1日の規制回数
+    永続の規制回数
 
-        // sine
-        var oscillator = audioCtx.createOscillator();
-        oscillator.connect( audioCtx.destination );
-        oscillator.type = 'sine';
-        oscillator.frequency.value = 3000;
+    各記録するを行う上に必要な変数
+    スタートの時刻＋回数
+    */
 
-        var soundLength = 0.5;
-        oscillator.start();
-        oscillator.stop( audioCtx.currentTime + soundLength );
-        setTimeout(n.close.bind(n), 3000);
+    /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
+    if(now_bp==max_bp && document.querySelector("#top > section:nth-child(8) > div.t-Cnt.m-Btm5 > a > div > span")!=null){
+
+        work_alert();
+        // document.querySelector("#top > section:nth-child(8) > div.t-Cnt.m-Btm5 > a > div > span").click();
     }
 
+
+
+    return;
 }
 
 
