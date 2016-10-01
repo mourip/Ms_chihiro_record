@@ -65,6 +65,7 @@ function chi_heal_30(now_p){
 
 //alart音を鳴らす
 function work_alert(){
+
     var n = new Notification("全回復してますよ\nライブしてくださいね！");
     var audioCtx = new AudioContext;
     // sine
@@ -79,6 +80,31 @@ function work_alert(){
 
     //通知は3000ミリ秒表示する
     setTimeout(n.close.bind(n), 3000);
+}
+
+// ドリフに関する関数
+function dream_log(){
+    /*
+    今のAPと最大のAPを得る
+    */
+    //bpの表示がなかったら以降の処理を打ち切る
+    console.log("ドリフですよー");
+    if(document.querySelector("#bpImg")==null){
+         console.log("apを示すセレクタ-が無いです");
+         return ;
+    }
+
+    var now_bp=document.querySelector("#bpImg").innerText.split(" ")[2];
+    var max_bp=document.querySelector("#bpImg").innerText.split(" ")[4];
+
+    /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
+    if(now_bp==max_bp && document.querySelector("#top > div.m-Btm10 > a > div > span")!=null){
+        console.log("aaa");
+        work_alert();
+        // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
+    }
+    return;
+
 }
 
 // ロワに関する関数
@@ -140,12 +166,14 @@ function directory_root(){
 
 //イベントの種類を判定する関数
 function event_checker(){
-    if (document.querySelector("#event_challenge") != null )
+    if (document.querySelector("#event_challenge") != null)
         challenge_log();
-    else if (document.querySelector("#event_pmf") != null)
+    else if (document.querySelector("#event_pmf")  != null)
         fes_log();
-    else if(document.querySelector("#event_royale")!=null)
+    else if(document.querySelector("#event_royale")!= null)
         royale_log();
+    else if(document.querySelector("#event_dream") != null)
+        dream_log();
 }
 
 //通知の許可を得るための関数
