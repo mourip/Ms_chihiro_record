@@ -1,6 +1,6 @@
 {
   "name": "ちひろさんの記録簿",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "manifest_version": 2,
   "description": "お疲れ様です！今日もプロデューサーさんのお手伝いしますね",
   "permissions": [
@@ -13,32 +13,26 @@
 
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
-      "js": ["jquery-2.1.4.min.js", "item.js"],
-      "run_at": "document_idle"
-    },
-
-
-    {
-      "matches": ["http://sp.pf.mbga.jp/*"],
-      "js": ["jquery-2.1.4.min.js", "work.js"],
+      "js": ["jquery-2.1.4.min.js","moment.js","item.js"],
       "run_at": "document_idle"
     },
 
     {
       "matches": ["http://sp.mbga.jp/_pf_pay_confirm*"],
-      "js": ["jquery-2.1.4.min.js", "kakin.js"],
+      "js": ["jquery-2.1.4.min.js", "moment.js","kakin.js"],
       "run_at": "document_idle"
     },
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
-      "js": ["jquery-2.1.4.min.js", "event_top.js"],
+      "js": ["jquery-2.1.4.min.js","moment.js" ,"event_top.js"],
       "run_at": "document_idle"
     },
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
-      "js": ["jquery-2.1.4.min.js", "work_ctrl.js"],
+      "js": ["jquery-2.1.4.min.js", "moment.js","work_ctrl.js"],
       "run_at": "document_idle"
     }
+
 
   ]
 }

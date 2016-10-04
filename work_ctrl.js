@@ -45,8 +45,40 @@ BP #bp_mic
 累計回数
 */
 
+/*
+日付の計算が面倒なので、moment.jsを採用する
+これで日付の計算を自分で実装する必要がなくなる
+*/
+
+
+//日付を/区切りで得るための関数
+function get_date(){
+    //現在時刻をmomentオブジェクトとして取得
+    var now=moment();
+    // フォーマットに沿って時刻を出力
+    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
+    return dates;
+}
+
+function chi_heal_checker(now_p){
+    //過去のポイントを確認する
+    chrome.storage.local.get("last_p", function (value) {
+        // 過去のデータが存在しない場合は登録する
+        if(value.last_p!="undefined"){
+            chrome.storage.local.set({'last_p': now_p}, function () {});
+        }
+        //過去のポイントが増えている場合は以下の処理を行う
+        if(value.last_p<now_p){
+            //一旦更新する
+            chorome.storage.local.set({'last_p':now_p}, function() {} );
+
+            chi_heal_30(now_p-value.last_p);
+        }
+    });
+}
+
 // 30分のチヒールを記録する処理
-function chi_heal_30(now_p){
+function chi_heal_30(plus_p){
     // ストレージの種類
     // 時刻　前のp　累計p
 
@@ -54,9 +86,23 @@ function chi_heal_30(now_p){
     // スタート時刻の取得　30分経っていなかった場合　回数を増やすか確認して増えていたら増加する
     // そもそもkeyが存在していない場合は全部登録する
 
+    var now_time=get_date();
     chrome.storage.local.get("start_30m_time", function (value) {
-        if(value.key!="undefined"){
+        //存在しない場合は開始時刻と最初の回数（1回）
+        if(value.start_30m_time!="undefined"){
+            // 現在時刻と最終時刻の登録
+            chorome.storage.local.set({'start_30m_time':now_time},function(){});
+            chorome.storage.local.set({'last_30m_time':now_time},function(){});
+            // ここにいる時点で回復していることは明らかなので増えた文の値を足す
+            chrome.storage.local.set({'sum_30m_p':plus_p},function () {});
+        }
+        // 時刻が一緒になることはありえないので一旦elseで分岐
+        else {
+            // 最終時刻の時刻を入手する
+            chorome.storage.local.get('last_30m_time',function(val){
 
+
+            });
         }
     });
 
@@ -103,6 +149,10 @@ function dream_log(){
         work_alert();
         // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
     }
+
+    // ここからちひーるの記録にうつる
+    chi_heal_checker()
+
     return;
 
 }
@@ -205,6 +255,21 @@ function notifications_permission(){
 }
 
 
+//色々モーメントに対して試した関数（やりたいことは全部できることを確認済み）
+function moment_test(){
+    var now=moment()
+
+    var test_timea="2016/10/4/16/50/23"
+    var test=moment(test_timea,"YYYY/MM/DD/HH/mm/ss");
+    var now_time=now.format('YYYY/MM/DD/HH/mm/ss');
+    var test_time=test.format('YYYY/MM/DD/HH/mm/ss');
+    console.log("今:"+now_time);
+    console.log("例:"+test_time);
+    var diffs=test.diff(now,"m");
+    console.log("差："+diffs);
+}
+
+// moment_test();
 
 notifications_permission();
 directory_root();
