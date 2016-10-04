@@ -36,9 +36,10 @@
     },
     {
       "matches": ["http://sp.pf.mbga.jp/*"],
-      "js": ["jquery-2.1.4.min.js", "work_ctrl.js"],
+      "js": ["jquery-2.1.4.min.js", "moment.js","work_ctrl.js"],
       "run_at": "document_idle"
     }
+
 
   ]
 }
