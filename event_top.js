@@ -65,7 +65,6 @@ function commma_delete(pt_str){
     {
         pt = pt_str;
     }
-
     return pt;
 }
 
@@ -82,19 +81,9 @@ function dream_log(){
     var pt = "";
     // console.log(pt_str);
     if (pt_selector) {
-        if (isNaN(pt_str)) //,が含まれている時はNAN(Not a Number)として判定される
-        {
-            var pt_array = pt_str.split(",");
-            for (var i = 0; i < pt_array.length; i++) {
-                pt += String(pt_array[i]);
-            }
-
-        } else //,が含まれいないときはこっち
-        {
-            pt = pt_str;
-        }
+        pt=commma_delete(pt_str);
     }
-
+    
     var now_pt = pt;
     var rank = document.querySelector("#tab_01 > div.area_tab_2.t-Cnt > section > ul:nth-child(2) > li:nth-child(1)").innerText.split(":")[1];
 
