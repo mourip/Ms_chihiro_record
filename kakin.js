@@ -22,17 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
+function get_dates(){
+    //現在時刻をmomentオブジェクトとして取得
+    var now=moment();
+    // フォーマットに沿って時刻を出力
+    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
+    return dates;
+}
+
+
 function moba_write(num,dif)
 {
-  var DD = new Date();
-  var Year = DD.getYear()+1900;
-  var Month = DD.getMonth() + 1;
-  var Day = DD.getDate();
-  var Hours = DD.getHours();
-  var Minutes = DD.getMinutes();
-  var Seconds = DD.getSeconds();
-  var date = new Array(Year,Month,Day,Hours,Minutes,Seconds);
-  var dates=date.join("/");
+
+  var dates=get_dates();
   // console.log(dates);
   var utf8num = unescape(encodeURIComponent(num));
   var utf8dif = unescape(encodeURIComponent(dif));
