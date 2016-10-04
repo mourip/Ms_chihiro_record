@@ -18,16 +18,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+function get_dates(){
+    //現在時刻をmomentオブジェクトとして取得
+    var now=moment();
+    // フォーマットに沿って時刻を出力
+    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
+    return dates;
+}
+
+
 function memo_write_1(txt, num, dif) {
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
+
+    var dates = get_dates();
     // console.log(dates);
     var utf8num = unescape(encodeURIComponent(num));
     var utf8dif = unescape(encodeURIComponent(dif));
@@ -124,15 +126,8 @@ function item_checker(txt, num) {
 
 
 function event_memo_write_1(txt, num, dif) {
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
+
+    var dates = get_dates();
     // console.log(dates);
     var utf8num = unescape(encodeURIComponent(num));
     var utf8dif = unescape(encodeURIComponent(dif));
@@ -235,15 +230,8 @@ function update_checker(txt_time) {
     var last_time = txt_time.split("/");
     // console.log(last_time[0]);
     //現在時刻の確認
-    var DD = new Date();
-    var Year = DD.getYear();
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
+
+    var dates = get_dates();
     console.log(dates);
     if (Year > last_time[0]) //更新する必要あり
     {
@@ -427,7 +415,7 @@ function root_write() {
         // console.log(test);
         if (test == null) //該当するセレクタ-がなかった場合はスルーする（アイテム以外のURLで発動するはず）
             continue;
-        
+
         console.log(t_slector);
         var str = test.innerText.split("\n")
         console.log(str[0]); //何がアイテムあるのかの確認できる
