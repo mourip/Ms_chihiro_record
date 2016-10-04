@@ -52,6 +52,15 @@ event_top.jsが提供する機能
 //注意点
 //次の年に同じイベントが来ることは想定していないためold_resultのファイルの日程がかぶる可能性がある（アニバーサリーについてはそのとき考える）
 
+
+function get_dates(){
+    //現在時刻をmomentオブジェクトとして取得
+    var now=moment();
+    // フォーマットに沿って時刻を出力
+    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
+    return dates;
+}
+
 function commma_delete(pt_str){
     var pt="";
     if (isNaN(pt_str)) //,が含まれている時はNAN(Not a Number)として判定される
@@ -83,7 +92,7 @@ function dream_log(){
     if (pt_selector) {
         pt=commma_delete(pt_str);
     }
-    
+
     var now_pt = pt;
     var rank = document.querySelector("#tab_01 > div.area_tab_2.t-Cnt > section > ul:nth-child(2) > li:nth-child(1)").innerText.split(":")[1];
 
@@ -371,15 +380,8 @@ function item_writer(filename, drink_num, drink_dif) {
     console.log(filename+"記述");
     var num=drink_num;
     var dif=drink_dif;
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
+
+    var dates = get_dates();
     // console.log(dates);
     var utf8num = unescape(encodeURIComponent(num));
     var utf8dif = unescape(encodeURIComponent(dif));
@@ -497,15 +499,8 @@ function pt_checker(filename,now_pt,now_rank_n){
 function pt_write(filename,pt,pt_dif,rank,rank_dif){
 
     // 現在の日付の取得
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
+
+    var dates = get_dates();
     // console.log(dates);
     var utf8pt = unescape(encodeURIComponent(pt));
     var utf8pt_dif = unescape(encodeURIComponent(pt_dif));
