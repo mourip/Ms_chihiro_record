@@ -53,17 +53,10 @@ BP #bp_mic
 
 //日付を/区切りで得るための関数
 function get_date(){
-    // 現在の日付の取得
-    var DD = new Date();
-    var Year = DD.getYear() + 1900;
-    var Month = DD.getMonth() + 1;
-    var Day = DD.getDate();
-    var Hours = DD.getHours();
-    var Minutes = DD.getMinutes();
-    var Seconds = DD.getSeconds();
-    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
-    var dates = date.join("/");
-
+    //現在時刻をmomentオブジェクトとして取得
+    var now=moment();
+    // フォーマットに沿って時刻を出力
+    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
     return dates;
 }
 
@@ -262,6 +255,21 @@ function notifications_permission(){
 }
 
 
+//色々モーメントに対して試した関数（やりたいことは全部できることを確認済み）
+function moment_test(){
+    var now=moment()
+
+    var test_timea="2016/10/4/16/50/23"
+    var test=moment(test_timea,"YYYY/MM/DD/HH/mm/ss");
+    var now_time=now.format('YYYY/MM/DD/HH/mm/ss');
+    var test_time=test.format('YYYY/MM/DD/HH/mm/ss');
+    console.log("今:"+now_time);
+    console.log("例:"+test_time);
+    var diffs=test.diff(now,"m");
+    console.log("差："+diffs);
+}
+
+// moment_test();
 
 notifications_permission();
 directory_root();
