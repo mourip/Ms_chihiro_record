@@ -40,15 +40,30 @@ BP #bp_mic
 /*
 お仕事画面で記録したいこと
 ちひーるの回数
-30分後のごとの回数
-1日ごとの回数
-累計回数
+    30分後のごとの回数
+    1日ごとの回数
+    累計回数
 */
 
 /*
-日付の計算が面倒なので、moment.jsを採用する
-これで日付の計算を自分で実装する必要がなくなる
+chrome.storageの変数郡
+last_p:最終段階でのポイント
+start_30m_time:記録開始時刻
+last_30m_time:最後の記録の時刻
+sum_30m_p:その段階でのちひーるの回数（生で増えた分は検知できない）
+
+
+
 */
+
+
+/*
+ファイルの保存形式
+    30分版
+    DD/HH/MM~DD/MM, m,count
+
+ */
+
 
 
 //日付を/区切りで得るための関数
@@ -71,7 +86,6 @@ function chi_heal_checker(now_p){
         if(value.last_p<now_p){
             //一旦更新する
             chorome.storage.local.set({'last_p':now_p}, function() {} );
-
             chi_heal_30(now_p-value.last_p);
         }
     });
@@ -87,7 +101,8 @@ function chi_heal_30(plus_p){
     // そもそもkeyが存在していない場合は全部登録する
 
     var now_time=get_date();
-    chrome.storage.local.get("start_30m_time", function (value) {
+    //必要なキーを全部獲得しておく
+    chrome.storage.local.get(['start_30m_time','last_30m_time','sum_30m_p'], function (value) {
         //存在しない場合は開始時刻と最初の回数（1回）
         if(value.start_30m_time!="undefined"){
             // 現在時刻と最終時刻の登録
@@ -98,11 +113,43 @@ function chi_heal_30(plus_p){
         }
         // 時刻が一緒になることはありえないので一旦elseで分岐
         else {
-            // 最終時刻の時刻を入手する
-            chorome.storage.local.get('last_30m_time',function(val){
 
+            //最初の時刻のmomentオブジェクトを得る
+            var start_30m_time_moment=moment(value.start_30m_time,"YYYY/MM/DD/HH/mm/ss");
+            // 今の時刻のmomentオブジェクトを得る
+            var now_time_moment=moment(now_time,"YYYY/MM/DD/HH/mm/ss");
 
-            });
+            // 時刻の差分をとる
+            var diff_time=now_time_moment.diff(start_30m_time_moment,"m");
+
+            // 差分の時間が30分以上の時は結果をファイルを通知を出す
+            if(Number(diff_time)>=30){
+                // 開始時刻のduring形式の文字列を得る
+                var startDDHHmm=start_30m_time_moment.format('DD/HH/mm');
+                // 最終時刻のモーメントを獲得する
+                var last_30m_time_moment=moment(value.last_30m_time,"YYYY/MM/DD/HH/mm/ss");
+                // 最終時刻のduring形式の文字列を得る
+                var lastDDHHmm=last_30m_time_moment.format('DD/HH/mm');
+                // during形式の文字列を獲得
+                var during=startDDHHmm+"~"+last_time_moment;
+
+                // lasttimeとstarttimeの時間の差分を得る
+                var last_start_diff=last_30m_time_moment.diff(start_30m_time_moment,"m");
+                
+                // ファイルの保存
+                // save_txt("chi_heal_30m.txt",during,diff_time,count);
+                // 通知の出力
+                // notifications_chi_heal(during,diff_time,count,true)
+                // 新しく登録し直す
+                // 現在時刻と最終時刻の登録
+                chorome.storage.local.set({'start_30m_time':now_time},function(){});
+                chorome.storage.local.set({'last_30m_time':now_time},function(){});
+                // 回復量を初期値とする
+                chrome.storage.local.set({'sum_30m_p':plus_p},function () {});
+            }
+
+            //差分の時間が30分以下の時は最終時刻の更新を行う
+
         }
     });
 
@@ -263,13 +310,16 @@ function moment_test(){
     var test=moment(test_timea,"YYYY/MM/DD/HH/mm/ss");
     var now_time=now.format('YYYY/MM/DD/HH/mm/ss');
     var test_time=test.format('YYYY/MM/DD/HH/mm/ss');
-    console.log("今:"+now_time);
-    console.log("例:"+test_time);
+    // console.log("今:"+now_time);
+    // console.log("例:"+test_time);
     var diffs=test.diff(now,"m");
-    console.log("差："+diffs);
+    var test_time2=test.format('DD/HH/mm');
+    // console.log(test_time2);
+    // console.log("差："+diffs);
+
 }
 
-// moment_test();
+moment_test();
 
 notifications_permission();
 directory_root();
