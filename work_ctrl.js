@@ -183,8 +183,6 @@ function chi_heal_2m(plus_p){
 
 }
 
-
-
 // 30分のチヒールを記録する処理
 function chi_heal_30m(plus_p){
     // ストレージの種類
@@ -199,16 +197,16 @@ function chi_heal_30m(plus_p){
     chrome.storage.local.get(['start_30m_time','last_30m_time','sum_30m_p'], function (value) {
         //存在しない場合は開始時刻と最初の回数（1回）
         if(value.start_30m_time!="undefined"){
-            console.log("2分コース初回ですね！");
+            console.log("30分コース初回ですね！");
             // 現在時刻と最終時刻の登録
             chrome.storage.local.set({'start_30m_time':now_time},function(){});
             chrome.storage.local.set({'last_30m_time':now_time},function(){});
             // ここにいる時点で回復していることは明らかなので増えた文の値を足す
-            chrome.storage.local.set({'sum_30m_p':plus_p},function () {});
+            chrome.storage.local.set({'sum_30m_p':Number(plus_p)},function () {});
         }
         // 時刻が一緒になることはありえないので一旦elseで分岐
         else {
-            console.log("2分コースですね！")
+            console.log("30分コースですね！")
             //最初の時刻のmomentオブジェクトを得る
             var start_30m_time_moment=moment(value.start_30m_time,"YYYY/MM/DD/HH/mm/ss");
             // 今の時刻のmomentオブジェクトを得る
@@ -216,8 +214,11 @@ function chi_heal_30m(plus_p){
             // 時刻の差分をとる
             var diff_time=now_time_moment.diff(start_30m_time_moment,"m");
 
+            console.log("差："+diff_time);
+            console.log("開始時刻："+start_2m_time_moment.format("DD/HH/mm"));
+            console.log("今の時刻"+now_time_moment.format("DD/HH/mm"));
             // 差分の時間が30分以上の時は結果をファイルに保存＋通知を出す
-            if(Number(diff_time)>=30){
+            if(Number(diff_time)>=29){
                 console.log("30分経っていますね！");
                 // 開始時刻のduring形式の文字列を得る
                 var startDDHHmm=start_30m_time_moment.format('DD/HH/mm');
@@ -235,15 +236,15 @@ function chi_heal_30m(plus_p){
                 save_txt("chi_heal_30m.txt","minutes",during,last_start_diff,value.sum_30m_p);
                 // 通知の出力
                 // 出力するtxtはこちらで用意する
-
-                var notification_txt=during+"\n"+String(count)+"分:"+String(value.sum_30m_p)
+                // var count=value.sum_2m_p;
+                var notification_txt=during+"\n"+String(diff_time)+"分:"+String(count)+"回　,効率:"+(Number(count)/(Number(diff_time)));
                 notifications_chi_heal(during,diff_time,count,true)
                 // 新しく登録し直す
                 // 現在時刻と最終時刻の登録
                 chrome.storage.local.set({'start_30m_time':now_time},function(){});
                 chrome.storage.local.set({'last_30m_time':now_time},function(){});
                 // 回復量を初期値とする
-                chrome.storage.local.set({'sum_30m_p':plus_p},function () {});
+                chrome.storage.local.set({'sum_30m_p':Number(plus_p)},function () {});
             }
 
             //差分の時間が30分以下の時は最終時刻の更新を行う
@@ -251,7 +252,8 @@ function chi_heal_30m(plus_p){
                 // 最終時刻の更新
                 chrome.storage.local.set({'last_30m_time':now_time},function(){});
                 // 回復量の記録
-                chrome.storage.local.set({'sum_30m_p':value.sum_30m_p+plus_p},function () {});
+                chrome.storage.local.set({'sum_30m_p':Number(value.sum_30m_p)+Number(plus_p)},function () {});
+                console.log("今のポイント："+value.sum_2m_p);
 
             }
         }
