@@ -76,7 +76,7 @@ function get_date(){
 
 function chi_heal_checker(now_p){
     //過去のポイントを確認する
-    console.log(now_p);
+    // console.log(now_p);
 
     chrome.storage.local.get("last_p", function (value) {
         // 過去のデータが存在しない場合は登録する
@@ -95,6 +95,11 @@ function chi_heal_checker(now_p){
         else if(value.last_p>now_p){
             // 一旦更新するだけになる
             console.log("減っているみたいですね！");
+            chi_heal_2m(0);
+        }
+        else if(value.last_p==now_p){
+            console.log("変化ないですね");
+            chi_heal_2m(0);
         }
 
     });
@@ -137,7 +142,7 @@ function chi_heal_2m(plus_p){
             console.log("開始時刻："+start_2m_time_moment.format("DD/HH/mm"));
             console.log("今の時刻"+now_time_moment.format("DD/HH/mm"));
             // 差分の時間が2分以上の時は結果をファイルに保存＋通知を出す
-            if(Number(diff_time)>=1){
+            if(Number(diff_time)>=2){
                 console.log("2分経っていますね！");
                 // 開始時刻のduring形式の文字列を得る
                 var startDDHHmm=start_2m_time_moment.format('DD/HH/mm');
@@ -151,12 +156,19 @@ function chi_heal_2m(plus_p){
                 // lasttimeとstarttimeの時間の差分を得る
                 var last_start_diff=last_2m_time_moment.diff(start_2m_time_moment,"m");
 
+                console.log("経過時間："+String(last_start_diff));
+
                 // ファイルの保存
-                save_txt("chi_heal_2m.txt","minutes",during,last_start_diff,value.sum_2m_p);
+                save_txt("chi_heal_2m.txt","minutes",during,last_start_diff,value.sum_2m_p,Number(count)/Number(last_start_diff));
                 // 通知の出力
                 // 出力するtxtはこちらで用意する
                 var count=value.sum_2m_p;
-                var notification_txt=during+"\n"+String(diff_time)+"分:"+String(count)+"回　,効率:"+(Number(count)/(Number(diff_time)));
+                console.log("************************************************");
+                console.log(Number(count)/Number(last_start_diff));
+                console.log(Number(count));
+                console.log(Number(last_start_diff));
+                console.log("************************************************");
+                var notification_txt=during+"\n"+String(last_start_diff)+"分:"+String(count)+"回,"+(Number(count)/Number(last_start_diff));
                 notifications_chi_heal(notification_txt,diff_time,count,true)
                 // 新しく登録し直す
                 // 現在時刻と最終時刻の登録
@@ -196,7 +208,7 @@ function chi_heal_30m(plus_p){
     //必要なキーを全部獲得しておく
     chrome.storage.local.get(['start_30m_time','last_30m_time','sum_30m_p'], function (value) {
         //存在しない場合は開始時刻と最初の回数（1回）
-        if(value.start_30m_time!="undefined"){
+        if(value.start_30m_time=="undefined"){
             console.log("30分コース初回ですね！");
             // 現在時刻と最終時刻の登録
             chrome.storage.local.set({'start_30m_time':now_time},function(){});
@@ -215,7 +227,7 @@ function chi_heal_30m(plus_p){
             var diff_time=now_time_moment.diff(start_30m_time_moment,"m");
 
             console.log("差："+diff_time);
-            console.log("開始時刻："+start_2m_time_moment.format("DD/HH/mm"));
+            console.log("開始時刻："+start_30m_time_moment.format("DD/HH/mm"));
             console.log("今の時刻"+now_time_moment.format("DD/HH/mm"));
             // 差分の時間が30分以上の時は結果をファイルに保存＋通知を出す
             if(Number(diff_time)>=29){
@@ -233,7 +245,7 @@ function chi_heal_30m(plus_p){
                 var last_start_diff=last_30m_time_moment.diff(start_30m_time_moment,"m");
 
                 // ファイルの保存
-                save_txt("chi_heal_30m.txt","minutes",during,last_start_diff,value.sum_30m_p);
+                save_txt("chi_heal_30m.txt","minutes",during,last_start_diff,value.sum_30m_p,Number(count)/(Number(diff_time)));
                 // 通知の出力
                 // 出力するtxtはこちらで用意する
                 // var count=value.sum_2m_p;
@@ -262,7 +274,8 @@ function chi_heal_30m(plus_p){
 
 }
 
-function save_txt(filename,unit,during,diff_time,count){
+function save_txt(filename,unit,during,diff_time,count,efficiency){
+    console.log(efficiency);
 
     // console.log(dates);
     // 書き込むデータをUTF８形式にする
@@ -270,6 +283,7 @@ function save_txt(filename,unit,during,diff_time,count){
     var utf8diff_time = unescape(encodeURIComponent(diff_time));
     var utf8count=unescape(encodeURIComponent(count));
     var utf8unit=unescape(encodeURIComponent(unit));
+    var utf8effi=unescape(encodeURIComponent(efficiency));
 
     var txt_name ="etc/" +filename;
         // PRESISTENTで勝手に削除されないようにする
@@ -286,13 +300,13 @@ function save_txt(filename,unit,during,diff_time,count){
                 var lines = '';
                 //  0バイトファイルの場合、ヘッダ行を作成する
                 if (fileWriter.length == 0) {
-                    var headers = new Array("during",utf8unit,"count");
+                    var headers = new Array("during",utf8unit,"count","efficiency");
                     lines = headers.join(",") + "\n";
 
                 }
 
                 //  データ行の作成
-                var details = new Array(utf8during, utf8diff_time, utf8count);
+                var details = new Array(utf8during, utf8diff_time, utf8count,utf8effi);
                 lines += details.join(",") + "\n";
                 var blob = new Blob([lines], {
                     type: 'text/plain'
