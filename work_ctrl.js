@@ -66,6 +66,7 @@ sum_30m_p:その段階でのちひーるの回数（生で増えた分は検知�
 
 
 //日付を/区切りで得るための関数
+/*この関数郡は一旦封印
 function get_date(){
     //現在時刻をmomentオブジェクトとして取得
     var now=moment();
@@ -364,6 +365,10 @@ function notifications_chi_heal(txt,flag){
 
 
 }
+*/
+
+
+
 
 //alart音+前回のお知らせ
 function work_alert(){
@@ -410,16 +415,64 @@ function dream_log(){
     // 数字以外がはいらないように安全弁をつける
     console.log(now_bp);
     if(Number(now_bp) ){
-        chi_heal_checker(now_bp);
+        // chi_heal_checker(now_bp);
     }
     //０はNaNらしいですよー
     else if(now_bp=="0"){
-        chi_heal_checker(0);
+        // chi_heal_checker(0);
     }
     // NaNならやらない
     else
         console.log("NaNですよー");
     return;
+
+}
+
+
+
+// ドリフに関する関数
+function challenge_log(){
+    /*
+    今のAPと最大のAPを得る
+    */
+    //bpの表示がなかったら以降の処理を打ち切る
+    console.log("チャレですよー");
+
+    // ｃｐのセレクタ－は２種類
+    // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
+    // #top > section:nth-child(8) > div:nth-child(3)
+    // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
+    // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
+    var now_bp="";
+    var max_bp="";
+
+    // セレクタ－が２種類以上あるためこれで対処
+    if(document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)")!=null){
+        var cptext0=document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[0]
+        var cptext1=document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[1]
+
+        now_bp=cptext0.split(" ")[1]
+        max_bp=cptext1.split(" ")[0]
+    }
+
+    else if(document.querySelector("#top > section:nth-child(8) > div:nth-child(3)")!=null){
+        var cptext0=document.querySelector("#top > section:nth-child(8) > div:nth-child(3)").innerText.split('/')[0]
+        var cptext1=document.querySelector("#top > section:nth-child(8) > div:nth-child(3)").innerText.split('/')[1]
+
+        now_bp=cptext0.split(" ")[1]
+        max_bp=cptext1.split(" ")[0]
+    }
+    else {
+        console.log("srekuta-")
+        return 
+    }
+
+    /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
+    if(now_bp==max_bp){
+        // console.log("aaa");
+        work_alert();
+        // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
+    }
 
 }
 
@@ -458,6 +511,9 @@ function royale_log(){
 
     return;
 }
+
+
+
 
 
 // ディレクトリを作成する関数
