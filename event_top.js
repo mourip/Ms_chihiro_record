@@ -26,7 +26,7 @@ SOFTWARE.
 event_top.jsが提供する機能
 1.イベントトップページにあるポイントと順位の記録
 2.古いイベントは各old_resultに保存
-3.イベントトップページに保存されているアイテムの記録（実装予定）
+3.イベントトップページに保存されているアイテムの記録
  */
 
 /*
@@ -47,7 +47,7 @@ event_top.jsが提供する機能
 
 
 //ファイルの書式
-//日付　ポイント　その差　順位　その差//日付の書式4桁~4桁とする（あとでファイルの処理がやりやすい）
+//日付　ポイント　その差　順位　その差　日付の書式4桁~4桁とする（あとでファイルの処理がやりやすい）
 
 //注意点
 //次の年に同じイベントが来ることは想定していないためold_resultのファイルの日程がかぶる可能性がある（アニバーサリーについてはそのとき考える）
@@ -75,6 +75,47 @@ function commma_delete(pt_str){
         pt = pt_str;
     }
     return pt;
+}
+
+
+// ツアーに関する関数
+function carnival_log(){
+    //現在のポイントの処理を行う
+    //総合ポイントのセレクタ-。これは毎回変える必要があると思う
+    // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
+    console.log("カーニバルやで");
+    var pt_selector = document.querySelector("#top > section:nth-child(20) > section > ul:nth-child(5) > li:nth-child(2)");
+
+    // pt_strには基本的に"　:　"なっている右側を取得しているはず
+    var pt_str = pt_selector.innerText.split(" ")[2]
+    var pt = "";
+    // console.log(pt_str);
+    // ,を削除する
+
+    if (pt_selector) {
+        pt=commma_delete(pt_str);
+    }
+    var now_pt = pt;
+
+    // 順位のセレクタ-から得る文字列
+    var rank = document.querySelector("#top > section:nth-child(20) > section > ul:nth-child(5) > li:nth-child(1)").innerText.split(":")[1];
+
+    // 位を削除する
+    var now_rank_n = rank.substr(0, rank.length - 1);
+
+    // 順位も,がドリフ？では入るので削除する。ついでに関数化
+    var now_rank_nn=commma_delete(now_rank_n);
+
+    // pt_checkerの引数に１を渡す。これでツアー独特のヘッダーに対応する
+    pt_checker("event/carnival.txt",now_pt,now_rank_nn,1);
+
+    //ここからアイテムの記録に関する処理(セレクターを変更する)
+    var normal_drink_num = document.querySelector("#carnival_header > div.event_items > div:nth-child(1)").innerText.split("×")[1];
+    // console.log(normal_drink_num);
+    var half_drink_num = document.querySelector("#carnival_header > div.event_items > div:nth-child(2)").innerText.split("×")[1];
+    // console.log(half_drink_num);
+    item_checker("event_item/LP.txt", normal_drink_num);
+    item_checker("event_item/LP_half.txt", half_drink_num);
 }
 
 
@@ -116,7 +157,7 @@ function dream_log(){
 /*チャレに関する関数*/
 function challenge_log() {
 
-
+    console.log("チャレやで")
     //現在のポイントの処理を行う
     //総合ポイントのセレクタ-。これは毎回変える必要があると思う
     // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
@@ -434,7 +475,7 @@ function item_writer(filename, drink_num, drink_dif) {
 }
 
 // ポイントを読み込むための関数
-function pt_checker(filename,now_pt,now_rank_n){
+function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
     var start_end_day=header_to_date();
     console.log(filename+"確認");
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
@@ -450,7 +491,7 @@ function pt_checker(filename,now_pt,now_rank_n){
                         // console.log(data);
                         if (!data) {
                             console.log(filename+":白紙なので、作成します");
-                            pt_write(filename,now_pt, 0, now_rank_n, 0);
+                            pt_write(filename,now_pt, 0, now_rank_n, 0,header_flag);
 
                         } else if (data) {
                             // データのすべてを得る
@@ -496,7 +537,7 @@ function pt_checker(filename,now_pt,now_rank_n){
 }
 
 // ポイントを記録するための関数
-function pt_write(filename,pt,pt_dif,rank,rank_dif){
+function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag=0){
 
     // 現在の日付の取得
 
@@ -730,6 +771,22 @@ function directry_root() {
         });
     });
 
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("old_event/carnival", {
+                    create: true
+                },
+                function(dirEntry) {
+                    // var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
 
 
     /*
@@ -743,9 +800,9 @@ function directry_root() {
     */
 
 }
+
 // イベントが何であるかを判定する関数
 function event_checker() {
-
     if (document.querySelector("#event_challenge") != null)
         challenge_log();
     else if (document.querySelector("#event_pmf") != null)
@@ -754,7 +811,6 @@ function event_checker() {
         royale_log();
     else if(document.querySelector("#event_dream") != null)
         dream_log();
-
 }
 
 
@@ -762,4 +818,26 @@ function event_checker() {
 if(document.querySelector("#event_header_info")!=null){
     directry_root();
     event_checker();
+}
+else{
+    console.log("ないで");
+}
+
+// ほぼツアー専用？
+// セレクタ-は日程のところを取得している
+if(document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period")!=null){
+    directry_root();
+    carnival_log();
+
+
+}
+
+test_f();
+function test_f(arg=true)
+{
+    var test=1
+    if(arg){
+        test=2
+    }
+    console.log(test);
 }
