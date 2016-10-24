@@ -1,12 +1,17 @@
 {
   "name": "ちひろさんの記録簿",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "manifest_version": 2,
   "description": "お疲れ様です！今日もプロデューサーさんのお手伝いしますね",
   "permissions": [
    "storage",
    "unlimitedStorage",
-   "notifications"
+   "notifications",
+	"webRequest",
+	"webRequestBlocking",
+	"contextMenus",
+	"webNavigation",
+   "clipboardRead"
  ],
 
   "content_scripts": [
@@ -31,8 +36,17 @@
       "matches": ["http://sp.pf.mbga.jp/*"],
       "js": ["jquery-2.1.4.min.js", "moment.js","work_ctrl.js"],
       "run_at": "document_idle"
+    },
+
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js","moment.js","music_test.js"],
+      "run_at": "document_idle"
     }
-
-
-  ]
+  ],
+  "web_accessible_resources": [
+    "sound/dame.mp3",
+    "sound/a.mp3",
+    "music_test.js"
+	]
 }
