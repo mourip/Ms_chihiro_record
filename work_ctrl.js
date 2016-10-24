@@ -373,17 +373,27 @@ function notifications_chi_heal(txt,flag){
 //alart音+前回のお知らせ
 function work_alert(){
 
-    var n = new Notification("全回復してますよ\nライブしてくださいね！");
-    var audioCtx = new AudioContext;
-    // sine
+    /*
     var oscillator = audioCtx.createOscillator();
     oscillator.connect( audioCtx.destination );
-    oscillator.type = 'sine';
+    oscillator.type = 'square';
     oscillator.frequency.value = 1000;
 
-    var soundLength = 0.3;
+    var soundLength = 0.1;
     oscillator.start();
     oscillator.stop( audioCtx.currentTime + soundLength );
+    */
+    var n = new Notification("全回復してますよ\nライブしてくださいね！");
+    var soundSrc = "dame.mp3";
+    if (soundSrc){
+        console.log("aaaa");
+      var playsrc = null;
+      playsrc = chrome.extension.getURL( ("./sound/"+soundSrc) );	//任意の場所というかpath的な
+      var audio = new Audio("");
+      audio.src = playsrc;	//URL
+      audio.volume = (30 / 100);	//30%のぼりゅーむ？]
+      audio.play();
+    }
 
     //通知は3000ミリ秒表示する
     setTimeout(n.close.bind(n), 3000);
@@ -462,9 +472,17 @@ function challenge_log(){
         now_bp=cptext0.split(" ")[1]
         max_bp=cptext1.split(" ")[0]
     }
+    // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
+    // 無課金タイマーなしのとき
+    else if(document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)")!=null){
+      var cptext0=document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[0]
+      var cptext1=document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[1]
+      now_bp=cptext0.split(" ")[1]
+      max_bp=cptext1.split(" ")[0]
+    }
     else {
         console.log("srekuta-")
-        return 
+        return
     }
 
     /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
