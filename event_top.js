@@ -831,13 +831,3 @@ if(document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div
 
 
 }
-
-test_f();
-function test_f(arg=true)
-{
-    var test=1
-    if(arg){
-        test=2
-    }
-    console.log(test);
-}
