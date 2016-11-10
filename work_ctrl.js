@@ -370,7 +370,7 @@ function notifications_chi_heal(txt,flag){
 
 
 
-//alart音+前回のお知らせ
+//alart音+全快のお知らせ
 function work_alert(){
 
     /*
@@ -439,8 +439,39 @@ function dream_log(){
 }
 
 
+// TBSに関する関数
+function TBS_log(){
+    /*
+    今のTPと最大のTPを得る
+    #top > section:nth-child(9) > div.t-Cnt.m-Top5 > div
+    */
+    //TPの表示がなかったら以降の処理を打ち切る
+    console.log("TBSですよー");
+    if(document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div")==null){
+         console.log("TPを示すセレクタ-が無いです");
+         return ;
+    }
 
-// ドリフに関する関数
+    var now_TP=document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div").innerText.split(" ")[0].split("：")[1];
+    var max_TP=document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div").innerText.split(" ")[2];
+
+    console.log(now_TP);
+    console.log(max_TP);
+    /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
+    if(now_TP==max_TP){
+        // console.log("aaa");
+        work_alert();
+        // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
+    }
+
+
+    return;
+
+}
+
+
+
+// チャレに関する関数
 function challenge_log(){
     /*
     今のAPと最大のAPを得る
@@ -580,6 +611,8 @@ function event_checker(){
         royale_log();
     else if(document.querySelector("#event_dream") != null)
         dream_log();
+    else if(document.querySelector("#event_teamtalk") != null)
+        TBS_log();
 }
 
 //通知の許可を得るための関数
