@@ -384,7 +384,7 @@ function work_alert(){
     oscillator.stop( audioCtx.currentTime + soundLength );
     */
     var n = new Notification("全回復してますよ\nライブしてくださいね！");
-    var soundSrc = "dame.mp3";
+    var soundSrc = "a.mp3";
     if (soundSrc){
         console.log("aaaa");
       var playsrc = null;
