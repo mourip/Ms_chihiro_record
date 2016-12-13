@@ -469,6 +469,21 @@ function TBS_log(){
 
 }
 
+// ツアーに関する関数
+function carnival_log() {
+    console.log("ツアーですよ");
+    // ツアーではなぜか色々な情報がセレクタ-に入っているので改行でsplitする
+    //ここのセレクタ-を変更する
+    var lp=document.querySelector("#bpImg").innerText.split("\n")[0]
+    var maxlp=lp.split(" ")[4].split("　")[0]
+    var nowlp=lp.split(" ")[2]
+    console.log(maxlp)
+    console.log(nowlp)
+    if(maxlp==nowlp){
+        // console.log("警報");
+        work_alert();
+    }
+}
 
 
 // チャレに関する関数
@@ -613,6 +628,9 @@ function event_checker(){
         dream_log();
     else if(document.querySelector("#event_teamtalk") != null)
         TBS_log();
+    else if(document.querySelector("#event_carnival")!=null){
+        carnival_log();
+    }
 }
 
 //通知の許可を得るための関数
