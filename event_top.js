@@ -84,7 +84,10 @@ function carnival_log(){
     //総合ポイントのセレクタ-。これは毎回変える必要があると思う
     // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
     console.log("カーニバルやで");
-    var pt_selector = document.querySelector("#top > section:nth-child(20) > section > ul:nth-child(5) > li:nth-child(2)");
+    var pt_selector = document.querySelector("#top > section:nth-child(21) > section > ul:nth-child(5) > li:nth-child(2)");
+
+    // console.log(pt_selector.innerText.split(" "))
+
 
     // pt_strには基本的に"　:　"なっている右側を取得しているはず
     var pt_str = pt_selector.innerText.split(" ")[2]
@@ -98,17 +101,15 @@ function carnival_log(){
     var now_pt = pt;
 
     // 順位のセレクタ-から得る文字列
-    var rank = document.querySelector("#top > section:nth-child(20) > section > ul:nth-child(5) > li:nth-child(1)").innerText.split(":")[1];
+    var rank = document.querySelector("#top > section:nth-child(21) > section > ul:nth-child(5) > li:nth-child(1)").innerText.split(":")[1];
 
     // 位を削除する
     var now_rank_n = rank.substr(0, rank.length - 1);
 
     // 順位も,がドリフ？では入るので削除する。ついでに関数化
     var now_rank_nn=commma_delete(now_rank_n);
-
     // pt_checkerの引数に１を渡す。これでツアー独特のヘッダーに対応する
     pt_checker("event/carnival.txt",now_pt,now_rank_nn,1);
-
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#carnival_header > div.event_items > div:nth-child(1)").innerText.split("×")[1];
     // console.log(normal_drink_num);
@@ -476,7 +477,18 @@ function item_writer(filename, drink_num, drink_dif) {
 
 // ポイントを読み込むための関数
 function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
-    var start_end_day=header_to_date();
+    var start_end_day;
+    if(flag=0){
+        // ツアー以外はこの処理でいける
+        console.log("ツアー以外やな");
+        start_end_day=header_to_date();
+    }
+    else if(flag){
+        // ツアーはここにつく
+        console.log("ツアーやな");
+        start_end_day=header_to_date2();
+    }
+
     console.log(filename+"確認");
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
@@ -548,12 +560,29 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag=0){
     var utf8rank = unescape(encodeURIComponent(rank));
     var utf8rank_dif = unescape(encodeURIComponent(rank_dif));
 
+    var start_end_day;
+    var start_day;
+    var end_day;
+    if(flag=0){
+        // ツアー以外はこの処理でいける
+        console.log("ツアー以外やな");
+        var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
+        start_day = headers_text[1].split("/");
+        end_day = headers_text[2].split("～")[1].split("/");
+        start_end_day=header_to_date();
+    }
+    else if(flag){
+        // ツアーはここにつく
+        console.log("ツアーやな");
+        var headers_text = document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period").innerText.split(" ");
+        start_day = headers_text[1].split("/");
+        end_day = headers_text[2].split("～")[1].split("/");
+        start_end_day=header_to_date2();
+    }
     //ヘッダー行のからのイベント期間の取得
-    var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
-    var start_day = headers_text[1].split("/");
-    var end_day = headers_text[2].split("～")[1].split("/");
 
-    var start_end_day = header_to_date();
+
+
     // PRESISTENTで勝手に削除されないようにする
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
@@ -632,6 +661,48 @@ function header_to_date(){
     var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
     return start_end_day;
 }
+
+//ヘッダーから日付を得るための関数
+function header_to_date2(){
+    var headers_text = document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period").innerText.split(" ");
+    var start_day = headers_text[1].split("/");
+    var end_day = headers_text[2].split("～")[1].split("/");
+    // 月と日を2桁の数に変換していく
+
+    // 1スタートの月の変換
+    var start_day_m = "";
+    if (Number(start_day[0]) < 10) {
+        start_day_m = "0" + start_day[0];
+    } else {
+        start_day_m = start_day[0];
+    }
+    // 2スタートの日の変換
+    var start_day_d = ""
+    if (Number(start_day[1]) < 10) {
+        start_day_d = "0" + start_day[1];
+    } else {
+        start_day_d = start_day[1];
+    }
+
+    // 3エンドの月の変換
+    var end_day_m = "";
+    if (Number(end_day[0]) < 10) {
+        end_day_m = "0" + end_day[0];
+    } else {
+        end_day_m = end_day[0];
+    }
+    // 4エンドの日の変換
+    var end_day_d = ""
+    if (Number(end_day[1]) < 10) {
+        end_day_d = "0" + end_day[1];
+    } else {
+        end_day_d = end_day[1];
+    }
+
+    var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
+    return start_end_day;
+}
+
 
 //ディレクトリを作成するための関数
 function directry_root() {
