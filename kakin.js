@@ -119,7 +119,7 @@ function moba_checker(num)
                       if(String(last_item_num)!=String(num))
                       {
                         console.log("更新します");
-                        moba_write(txt,num,Number(num)-Number(last_item_num));
+                        moba_write(num,Number(num)-Number(last_item_num));
                       }
                       else
                       {
