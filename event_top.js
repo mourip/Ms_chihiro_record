@@ -191,9 +191,9 @@ function challenge_log() {
     pt_checker("event/challenge.txt",now_pt,now_rank_n);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
-    var normal_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(1)").innerText.split("×")[1];
+    var normal_drink_num = document.querySelector("#idol_stage_slide > div > ul > li:nth-child(1) > div > div.event_items > div:nth-child(1)").innerText.split("×")[1];
     // console.log(normal_drink_num);
-    var half_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(3) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(2)").innerText.split("×")[1];
+    var half_drink_num = document.querySelector("#idol_stage_slide > div:nth-child(1) > ul > li:nth-child(1) > div > div.event_items > div:nth-child(2)").innerText.split("×")[1];
     // console.log(half_drink_num);
     item_checker("event_item/CP.txt", normal_drink_num);
     item_checker("event_item/CP_half.txt", half_drink_num);
@@ -478,12 +478,12 @@ function item_writer(filename, drink_num, drink_dif) {
 // ポイントを読み込むための関数
 function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
     var start_end_day;
-    if(flag=0){
+    if(header_flag==0){
         // ツアー以外はこの処理でいける
         console.log("ツアー以外やな");
         start_end_day=header_to_date();
     }
-    else if(flag){
+    else if(header_flag==1){
         // ツアーはここにつく
         console.log("ツアーやな");
         start_end_day=header_to_date2();
@@ -549,7 +549,7 @@ function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
 }
 
 // ポイントを記録するための関数
-function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag=0){
+function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
 
     // 現在の日付の取得
 
@@ -563,7 +563,7 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag=0){
     var start_end_day;
     var start_day;
     var end_day;
-    if(flag=0){
+    if(header_flag==0){
         // ツアー以外はこの処理でいける
         console.log("ツアー以外やな");
         var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
@@ -571,7 +571,7 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag=0){
         end_day = headers_text[2].split("～")[1].split("/");
         start_end_day=header_to_date();
     }
-    else if(flag){
+    else if(header_flag==1){
         // ツアーはここにつく
         console.log("ツアーやな");
         var headers_text = document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period").innerText.split(" ");
@@ -580,10 +580,8 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag=0){
         start_end_day=header_to_date2();
     }
     //ヘッダー行のからのイベント期間の取得
-
-
-
     // PRESISTENTで勝手に削除されないようにする
+    console.log(start_end_day)
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
         fileSystem.root.getFile(filename, {'create': true},function(fileEntry) {
@@ -659,6 +657,7 @@ function header_to_date(){
     }
 
     var start_end_day = start_day_m + start_day_d + "~" + end_day_m + end_day_d
+    // console.log(start_end_day);
     return start_end_day;
 }
 
