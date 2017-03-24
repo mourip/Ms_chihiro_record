@@ -563,7 +563,7 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
     var start_end_day;
     var start_day;
     var end_day;
-    if(header_flag==0){
+    if(flag==0){
         // ツアー以外はこの処理でいける
         console.log("ツアー以外やな");
         var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
@@ -571,7 +571,7 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
         end_day = headers_text[2].split("～")[1].split("/");
         start_end_day=header_to_date();
     }
-    else if(header_flag==1){
+    else if(flag){
         // ツアーはここにつく
         console.log("ツアーやな");
         var headers_text = document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period").innerText.split(" ");
@@ -581,7 +581,7 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
     }
     //ヘッダー行のからのイベント期間の取得
     // PRESISTENTで勝手に削除されないようにする
-    console.log(start_end_day)
+    console.log
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
         fileSystem.root.getFile(filename, {'create': true},function(fileEntry) {
