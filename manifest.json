@@ -42,6 +42,11 @@
       "matches": ["http://sp.pf.mbga.jp/*"],
       "js": ["jquery-2.1.4.min.js","moment.js","music_test.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://sp.pf.mbga.jp/*"],
+      "js": ["jquery-2.1.4.min.js","moment.js","koikoi.js"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
