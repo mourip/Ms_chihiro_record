@@ -18,11 +18,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-function get_dates(){
+function get_dates() {
     //現在時刻をmomentオブジェクトとして取得
-    var now=moment();
+    var now = moment();
     // フォーマットに沿って時刻を出力
-    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
+    var dates = now.format('YYYY/MM/DD/HH/mm/ss');
     return dates;
 }
 
@@ -34,9 +34,9 @@ function memo_write_1(txt, num, dif) {
     var utf8num = unescape(encodeURIComponent(num));
     var utf8dif = unescape(encodeURIComponent(dif));
 
-    var txt_name ="item/" +txt + ".txt"
-        // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024 * 1024*5, function(fileSystem) {
+    var txt_name = "item/" + txt + ".txt"
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 5, function(fileSystem) {
 
         fileSystem.root.getFile(txt_name, {
             'create': true
@@ -81,7 +81,7 @@ function memo_write_1(txt, num, dif) {
 }
 
 function item_checker(txt, num) {
-    var txt_name ="item/" +txt + ".txt"
+    var txt_name = "item/" + txt + ".txt"
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
@@ -132,9 +132,9 @@ function event_memo_write_1(txt, num, dif) {
     var utf8num = unescape(encodeURIComponent(num));
     var utf8dif = unescape(encodeURIComponent(dif));
 
-    var txt_name ="event_item/" +txt + ".txt"
-        // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024 * 1024*5, function(fileSystem) {
+    var txt_name = "event_item/" + txt + ".txt"
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 5, function(fileSystem) {
 
         fileSystem.root.getFile(txt_name, {
             'create': true
@@ -180,7 +180,7 @@ function event_memo_write_1(txt, num, dif) {
 
 //イベントアイテムのリストを更新する必要があるかどうかについて
 function event_item_checker(txt, num) {
-    var txt_name ="event_item/" +txt + ".txt"
+    var txt_name = "event_item/" + txt + ".txt"
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
@@ -274,16 +274,18 @@ function update_checker(txt_time) {
 }
 
 function delete_files(txt) {
-  // PRESISTENTで勝手に削除されないようにする
-  var txt_name=txt+".txt";
-  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
+    // PRESISTENTで勝手に削除されないようにする
+    var txt_name = txt + ".txt";
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-    fileSystem.root.getFile(txt_name, {'create':false}, function(fileEntry){
-      fileEntry.remove(function() {
-      console.log('File removed.');
+        fileSystem.root.getFile(txt_name, {
+            'create': false
+        }, function(fileEntry) {
+            fileEntry.remove(function() {
+                console.log('File removed.');
+            });
+        });
     });
-  });
-});
 }
 
 
@@ -293,27 +295,31 @@ function write_copy(txt, data) {
     var txt_name = "item/" + String(txt) + ".txt";
     // PRESISTENTで勝手に削除されないようにする
     // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-      fileSystem.root.getFile(txt_name, {'create':true}, function(fileEntry){
-        fileEntry.createWriter(function(fileWriter){
+        fileSystem.root.getFile(txt_name, {
+            'create': true
+        }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
 
 
-          //  出力行
-          var lines = data;
-          //  データ行の作成
-         var blob = new Blob([lines],{type: 'text/plain'});
+                //  出力行
+                var lines = data;
+                //  データ行の作成
+                var blob = new Blob([lines], {
+                    type: 'text/plain'
+                });
 
-          fileWriter.write(blob);
-          fileWriter.onwriteend = function(e) {
-            console.log(txt_name+':copy completed.');
-          };
-          fileWriter.onerror = function(e) {
-            console.log(txt_name+':copy failed: ' + e.toString());
-          };
+                fileWriter.write(blob);
+                fileWriter.onwriteend = function(e) {
+                    console.log(txt_name + ':copy completed.');
+                };
+                fileWriter.onerror = function(e) {
+                    console.log(txt_name + ':copy failed: ' + e.toString());
+                };
 
+            });
         });
-      });
     });
     delete_files(txt);
 }
@@ -354,7 +360,7 @@ function copy_data_write(txt) {
 
 //ディレクトリを作成するための関数
 function directry_root() {
-  // 通常アイテムを管理するitemフォルダを作成するための処理
+    // 通常アイテムを管理するitemフォルダを作成するための処理
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             fs.root.getDirectory("item", {
@@ -408,7 +414,7 @@ function root_write() {
     // #top > div:nth-child(6) > table > tbody > tr > td:nth-child(2
     for (var i = 0; i < 100; i++) {
         //forループで無理やり記録を取る
-        var t_slector = "#top > div:nth-child("+i+") > table > tbody > tr > td:nth-child(2)";
+        var t_slector = "#top > div:nth-child(" + i + ") > table > tbody > tr > td:nth-child(2)";
         //
         //
         var test = document.querySelector(t_slector);
@@ -424,7 +430,7 @@ function root_write() {
             case "スタミナドリンク":
                 var t_num_selector = t_slector + ">span.pink";
                 var have_num = document.querySelector(t_num_selector);
-                console.log(str[0]+":"+have_num.innerText);
+                console.log(str[0] + ":" + have_num.innerText);
                 //スタドリを記録するファイルを読み取る
                 item_checker("stamina", have_num.innerText);
                 break;

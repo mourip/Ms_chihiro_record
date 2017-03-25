@@ -33,51 +33,160 @@ SOFTWARE.
 
 
 
-function kisei()
-{
-  var kisei_selector=document.querySelector("#top > h2 > div");
-  if(kisei_selector!=null)
-  {
-    if(kisei_selector.innerText=="通信規制")
-    {
-      //tempというディレクトリの作成
-      navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
-          window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-              fs.root.getDirectory("temp", {
-                      create: true
-                  },
-                  function(dirEntry) {
-                      var text = "ディレクトリパス：" + dirEntry.fullPath;
-                      // console.log(text);
-                      //text += "ディレクトリ名："+dirEntry.name+"<br>";
-                      //document.getElementById("result").innerHTML = text;
-                  },
-                  function(err) { // 失敗時のコールバック関数
-                      console.log(err);
-                  });
-          });
-      });
+function kisei() {
+    var kisei_selector = document.querySelector("#top > h2 > div");
+    if (kisei_selector != null) {
+        if (kisei_selector.innerText == "通信規制") {
+            //tempというディレクトリの作成
+            navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+                window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+                    fs.root.getDirectory("temp", {
+                            create: true
+                        },
+                        function(dirEntry) {
+                            var text = "ディレクトリパス：" + dirEntry.fullPath;
+                            // console.log(text);
+                            //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                            //document.getElementById("result").innerHTML = text;
+                        },
+                        function(err) { // 失敗時のコールバック関数
+                            console.log(err);
+                        });
+                });
+            });
 
-      /*時間ごとに記録する*/
-      navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
-          window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-              // ファイル取得
-              fs.root.getFile("temp/kisei.txt", {
-                  create: true
-              }, function(fileEntry) {
-                  fileEntry.file(function(file) {
-                      var reader = new FileReader();
-                      reader.onloadend = function(e) {
-                          data = e.target.result;
-                          // console.log(data);
-                          if (!data) {
-                              console.log("temp/kiseki:白紙");
-                              // 今のptを記録する関数を作成する
-                              temp_kisei_write();
-                          } else if (data)
-                          {
-                            var temp_array=data.split("\n");
-                            var last_time=temp_array[temp_array.length-2].split("/");
+            /*時間ごとに記録する*/
+            navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
+                window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+                    // ファイル取得
+                    fs.root.getFile("temp/kisei.txt", {
+                        create: true
+                    }, function(fileEntry) {
+                        fileEntry.file(function(file) {
+                            var reader = new FileReader();
+                            reader.onloadend = function(e) {
+                                data = e.target.result;
+                                // console.log(data);
+                                if (!data) {
+                                    console.log("temp/kiseki:白紙");
+                                    // 今のptを記録する関数を作成する
+                                    temp_kisei_write();
+                                } else if (data) {
+                                    var temp_array = data.split("\n");
+                                    var last_time = temp_array[temp_array.length - 2].split("/");
+                                    var DD = new Date();
+                                    var Year = DD.getYear() + 1900;
+                                    var Month = DD.getMonth() + 1;
+                                    var Day = DD.getDate();
+                                    var Hours = DD.getHours();
+                                    var Minutes = DD.getMinutes();
+                                    var Seconds = DD.getSeconds();
+                                    /*
+                                    これも時間を見て日を超えたらリセット
+                                    オーバーフローの危険性があるから
+                                    */
+
+                                    var last_time_num = Number(last_time[5]) + Number(last_time[4]) * 60 + Number(last_time[3]) * 3600;
+
+                                    var now_time_num = Seconds + Minutes * 60 + Hours * 3600;
+                                    if (Number(last_time[2]) != Day) {
+                                        console.log("規制回数：日を超えたのでリセットします");
+                                        del_kiseki_temp();
+                                    }
+                                    if (Number(now_time_num) - Number(last_time_num) > 60) {
+                                        console.log("同じ規制じゃないですね");
+                                        temp_kisei_write();
+
+                                    } else {
+                                        console.log("同じ規制ですよー");
+                                        // window.alert('同じ規制ですよー');
+                                    }
+                                    $("body").html($("body").html().replace(kisei_selector.innerText, "規制回数:" + String(temp_array.length - 1)));
+                                }
+                            }
+                            reader.readAsText(file);
+                        });
+                    });
+                });
+            });
+        } else {
+            navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
+                window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+                    // ファイル取得
+                    fs.root.getFile("temp/kisei.txt", {
+                        create: true
+                    }, function(fileEntry) {
+                        fileEntry.file(function(file) {
+                            var reader = new FileReader();
+                            reader.onloadend = function(e) {
+                                data = e.target.result;
+                                // console.log(data);
+                                if (!data) {
+                                    console.log("temp/kisei:からですわ");
+                                } else if (data) {
+                                    var temp_array = data.split("\n");
+                                    var start_time = temp_array[0].split("/");
+                                    var last_time = temp_array[temp_array.length - 2].split("/");
+                                    var DD = new Date();
+                                    var Year = DD.getYear() + 1900;
+                                    var Month = DD.getMonth() + 1;
+                                    var Day = DD.getDate();
+                                    var Hours = DD.getHours();
+                                    var Minutes = DD.getMinutes();
+                                    var Seconds = DD.getSeconds();
+                                    /*
+                                    これも時間を見て日を超えたらリセット
+                                    オーバーフローの危険性があるから
+                                    */
+
+                                    var last_time_num = Number(last_time[5]) + Number(last_time[4]) * 60 + Number(last_time[3]) * 3600;
+                                    var start_time_num = Number(start_time[5]) + Number(start_time[4]) * 60 + Number(start_time[3]) * 3600;
+
+                                    var now_time_num = Seconds + Minutes * 60 + Hours * 3600;
+                                    if (Number(now_time_num) - Number(start_time_num) > 60 * 30) {
+                                        console.log("３０分超えてるんで更新します");
+                                        /*書き込みの準備*/
+                                        var start_write = data.split("\n")[0];
+                                        var last_write = data.split("\n")[length - 2];
+                                        var kaisuu = Number(data.split("\n")).length - 1
+
+                                        var times = String(start_write) + "~" + String(last_write);
+
+                                        var elapsed_time = Number(last_time_num) - Number(start_time_num);
+                                        main_kisei_write(time, elapsed_time, kaisuu)
+                                    } else {
+                                        console.log("更新はまだ")
+                                    }
+                                }
+                            }
+                            reader.readAsText(file);
+                        });
+                    });
+                });
+            });
+        }
+    }
+
+}
+
+function temp_kisei_load() {
+
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            // ファイル取得
+            fs.root.getFile("temp/kisei.txt", {
+                create: true
+            }, function(fileEntry) {
+                fileEntry.file(function(file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function(e) {
+                        data = e.target.result;
+                        // console.log(data);
+                        if (!data) {
+                            console.log("temp/kiseki.txt:白紙");
+                            temp_kisei_write();
+                        } else if (data) {
+                            var last_time = data.split("\n")[length - 2].split("/");
                             var DD = new Date();
                             var Year = DD.getYear() + 1900;
                             var Month = DD.getMonth() + 1;
@@ -90,287 +199,162 @@ function kisei()
                             オーバーフローの危険性があるから
                             */
 
-                            var last_time_num=Number(last_time[5])+Number(last_time[4])*60+Number(last_time[3])*3600;
+                            var last_time_num = Number(last_time[5]) + Number(last_time[4]) * 60 + Number(last_time[3]) * 3600;
 
-                            var now_time_num=Seconds+Minutes*60+Hours*3600;
-                            if(Number(last_time[2])!=Day)
-                            {
-                              console.log("規制回数：日を超えたのでリセットします");
-                              del_kiseki_temp();
+                            var now_time_num = Seconds + Minutes * 60 + Hours * 3600;
+                            if (Number(last_time[2]) != Day) {
+                                console.log("規制回数：日を超えたのでリセットします");
+                                del_kiseki_temp();
                             }
-                            if(Number(now_time_num)-Number(last_time_num)>60)
-                            {
-                              console.log("同じ規制じゃないですね");
-                              temp_kisei_write();
-
+                            if (Number(now_time_num) - Number(last_time_num) > 60) {
+                                console.log("同じ規制じゃないですね");
+                                temp_kisei_write();
+                            } else {
+                                console.log("同じ規制ですよー");
+                                window.alert('同じ規制ですよー');
                             }
-                            else
-                            {
-                              console.log("同じ規制ですよー");
-                              // window.alert('同じ規制ですよー');
-                            }
-                            $("body").html($("body").html().replace(kisei_selector.innerText ,"規制回数:"+String(temp_array.length-1)));
-                          }
-                      }
-                      reader.readAsText(file);
-                  });
-              });
-          });
-      });
-    }
-    else
-    {
-      navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
-          window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-              // ファイル取得
-              fs.root.getFile("temp/kisei.txt", {
-                  create: true
-              }, function(fileEntry) {
-                  fileEntry.file(function(file) {
-                      var reader = new FileReader();
-                      reader.onloadend = function(e) {
-                          data = e.target.result;
-                          // console.log(data);
-                          if (!data) {
-                              console.log("temp/kisei:からですわ");
-                          } else if (data)
-                          {
-                            var temp_array=data.split("\n");
-                            var start_time=temp_array[0].split("/");
-                            var last_time=temp_array[temp_array.length-2].split("/");
-                            var DD = new Date();
-                            var Year = DD.getYear() + 1900;
-                            var Month = DD.getMonth() + 1;
-                            var Day = DD.getDate();
-                            var Hours = DD.getHours();
-                            var Minutes = DD.getMinutes();
-                            var Seconds = DD.getSeconds();
-                            /*
-                            これも時間を見て日を超えたらリセット
-                            オーバーフローの危険性があるから
-                            */
 
-                            var last_time_num=Number(last_time[5])+Number(last_time[4])*60+Number(last_time[3])*3600;
-                            var start_time_num=Number(start_time[5])+Number(start_time[4])*60+Number(start_time[3])*3600;
-
-                            var now_time_num=Seconds+Minutes*60+Hours*3600;
-                            if(Number(now_time_num)-Number(start_time_num)>60*30)
-                            {
-                              console.log("３０分超えてるんで更新します");
-                              /*書き込みの準備*/
-                              var start_write=data.split("\n")[0];
-                              var last_write=data.split("\n")[length-2];
-                              var kaisuu=Number(data.split("\n")).length-1
-
-                              var times=String(start_write)+"~"+String(last_write);
-
-                              var elapsed_time=Number(last_time_num)-Number(start_time_num);
-                              main_kisei_write(time,elapsed_time,kaisuu)
-                            }
-                            else
-                            {
-                              console.log("更新はまだ")
-                            }
-                          }
-                      }
-                      reader.readAsText(file);
-                  });
-              });
-          });
-      });
-    }
-  }
-
-}
-
-function temp_kisei_load()
-{
-
-  navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
-      window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-          // ファイル取得
-          fs.root.getFile("temp/kisei.txt", {
-              create: true
-          }, function(fileEntry) {
-              fileEntry.file(function(file) {
-                  var reader = new FileReader();
-                  reader.onloadend = function(e) {
-                      data = e.target.result;
-                      // console.log(data);
-                      if (!data)
-                      {
-                          console.log("temp/kiseki.txt:白紙");
-                          temp_kisei_write();
-                      } else if (data)
-                      {
-                        var last_time=data.split("\n")[length-2].split("/");
-                        var DD = new Date();
-                        var Year = DD.getYear() + 1900;
-                        var Month = DD.getMonth() + 1;
-                        var Day = DD.getDate();
-                        var Hours = DD.getHours();
-                        var Minutes = DD.getMinutes();
-                        var Seconds = DD.getSeconds();
-                        /*
-                        これも時間を見て日を超えたらリセット
-                        オーバーフローの危険性があるから
-                        */
-
-                        var last_time_num=Number(last_time[5])+Number(last_time[4])*60+Number(last_time[3])*3600;
-
-                        var now_time_num=Seconds+Minutes*60+Hours*3600;
-                        if(Number(last_time[2])!=Day)
-                        {
-                          console.log("規制回数：日を超えたのでリセットします");
-                          del_kiseki_temp();
                         }
-                        if(Number(now_time_num)-Number(last_time_num)>60)
-                        {
-                          console.log("同じ規制じゃないですね");
-                          temp_kisei_write();
-                        }
-                        else
-                        {
-                          console.log("同じ規制ですよー");
-                          window.alert('同じ規制ですよー');
-                        }
-
-                      }
-                  }
-                  reader.readAsText(file);
-              });
-          });
-      });
-  });
-}
-
-function temp_kisei_write()
-{
-  var DD = new Date();
-  var Year = DD.getYear()+1900;
-  var Month = DD.getMonth() + 1;
-  var Day = DD.getDate();
-  var Hours = DD.getHours();
-  var Minutes = DD.getMinutes();
-  var Seconds = DD.getSeconds();
-  var date = new Array(Year,Month,Day,Hours,Minutes,Seconds);
-  var dates=date.join("/");
-  // console.log(dates);
-  // PRESISTENTで勝手に削除されないようにする
-  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
-    fileSystem.root.getFile("temp/kisei.txt", {'create':true}, function(fileEntry){
-      fileEntry.createWriter(function(fileWriter){
-
-        //  ファイルの書き込み位置は、一番最後とする
-        fileWriter.seek(fileWriter.length);
-        //  出力行
-        var lines = '';
-        //  データ行の作成
-
-       var details = new Array(dates);
-       lines += details.join(",") + "\n";
-       var blob = new Blob([lines],{type: 'text/plain'});
-        fileWriter.write(blob);
-        fileWriter.onwriteend = function(e) {
-          console.log('temp/kisei.txt:Write completed.');
-        };
-        fileWriter.onerror = function(e) {
-          console.log('Write failed: ' + e.toString());
-        };
-
-      });
+                    }
+                    reader.readAsText(file);
+                });
+            });
+        });
     });
-  });
 }
 
-function main_kisei_write(times,elapsed_time,kisei_count)
-{
-  //tempというディレクトリの作成
-  navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
-      window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-          fs.root.getDirectory("etc", {
-                  create: true
-              },
-              function(dirEntry) {
-                  var text = "ディレクトリパス：" + dirEntry.fullPath;
-                  // console.log(text);
-                  //text += "ディレクトリ名："+dirEntry.name+"<br>";
-                  //document.getElementById("result").innerHTML = text;
-              },
-              function(err) { // 失敗時のコールバック関数
-                  console.log(err);
-              });
-      });
-  });
+function temp_kisei_write() {
+    var DD = new Date();
+    var Year = DD.getYear() + 1900;
+    var Month = DD.getMonth() + 1;
+    var Day = DD.getDate();
+    var Hours = DD.getHours();
+    var Minutes = DD.getMinutes();
+    var Seconds = DD.getSeconds();
+    var date = new Array(Year, Month, Day, Hours, Minutes, Seconds);
+    var dates = date.join("/");
+    // console.log(dates);
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
+        fileSystem.root.getFile("temp/kisei.txt", {
+            'create': true
+        }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
+
+                //  ファイルの書き込み位置は、一番最後とする
+                fileWriter.seek(fileWriter.length);
+                //  出力行
+                var lines = '';
+                //  データ行の作成
+
+                var details = new Array(dates);
+                lines += details.join(",") + "\n";
+                var blob = new Blob([lines], {
+                    type: 'text/plain'
+                });
+                fileWriter.write(blob);
+                fileWriter.onwriteend = function(e) {
+                    console.log('temp/kisei.txt:Write completed.');
+                };
+                fileWriter.onerror = function(e) {
+                    console.log('Write failed: ' + e.toString());
+                };
+
+            });
+        });
+    });
+}
+
+function main_kisei_write(times, elapsed_time, kisei_count) {
+    //tempというディレクトリの作成
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            fs.root.getDirectory("etc", {
+                    create: true
+                },
+                function(dirEntry) {
+                    var text = "ディレクトリパス：" + dirEntry.fullPath;
+                    // console.log(text);
+                    //text += "ディレクトリ名："+dirEntry.name+"<br>";
+                    //document.getElementById("result").innerHTML = text;
+                },
+                function(err) { // 失敗時のコールバック関数
+                    console.log(err);
+                });
+        });
+    });
 
 
 
-  // PRESISTENTで勝手に削除されないようにする
-  webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-      fileSystem.root.getFile("etc/kisei.txt", {
-          'create': true
-      }, function(fileEntry) {
-          fileEntry.createWriter(function(fileWriter) {
+        fileSystem.root.getFile("etc/kisei.txt", {
+            'create': true
+        }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
 
-              //  ファイルの書き込み位置は、一番最後とする
-              fileWriter.seek(fileWriter.length);
-              //  出力行
-              var lines = '';
-
-
-              //  0バイトファイルの場合、ヘッダ行を作成する
-              if (fileWriter.length == 0) {
-                  var headers = new Array("time", "elapsed_time[m]", "count");
-                  lines = headers.join(",") + "\n";
-
-              }
-
-              //  データ行の作成
-
-              var details = new Array(time, elapsed_time, kisei_count);
-              lines += details.join(",") + "\n";
-              var blob = new Blob([lines], {
-                  type: 'text/plain'
-              });
-
-              fileWriter.write(blob);
+                //  ファイルの書き込み位置は、一番最後とする
+                fileWriter.seek(fileWriter.length);
+                //  出力行
+                var lines = '';
 
 
-              fileWriter.onwriteend = function(e) {
-                  console.log('Write completed.');
-              };
+                //  0バイトファイルの場合、ヘッダ行を作成する
+                if (fileWriter.length == 0) {
+                    var headers = new Array("time", "elapsed_time[m]", "count");
+                    lines = headers.join(",") + "\n";
 
-              fileWriter.onerror = function(e) {
-                  console.log('Write failed: ' + e.toString());
-              };
+                }
 
-          });
-      });
-  });
+                //  データ行の作成
+
+                var details = new Array(time, elapsed_time, kisei_count);
+                lines += details.join(",") + "\n";
+                var blob = new Blob([lines], {
+                    type: 'text/plain'
+                });
+
+                fileWriter.write(blob);
+
+
+                fileWriter.onwriteend = function(e) {
+                    console.log('Write completed.');
+                };
+
+                fileWriter.onerror = function(e) {
+                    console.log('Write failed: ' + e.toString());
+                };
+
+            });
+        });
+    });
 
 }
 
 
-function del_kiseki_temp()
-{
-  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
+function del_kiseki_temp() {
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-    fileSystem.root.getFile("temp/kisei_count.txt", {'create':false}, function(fileEntry){
-      fileEntry.remove(function() {
-      console.log('temp/kisei_count.txt:removed.');
-      });
+        fileSystem.root.getFile("temp/kisei_count.txt", {
+            'create': false
+        }, function(fileEntry) {
+            fileEntry.remove(function() {
+                console.log('temp/kisei_count.txt:removed.');
+            });
+        });
     });
-  });
 
-  webkitRequestFileSystem(PERSISTENT, 1024*1024*10, function(fileSystem){
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-    fileSystem.root.getFile("temp/kisei.txt", {'create':false}, function(fileEntry){
-      fileEntry.remove(function() {
-      console.log('temp/kisei.txt:removed.');
-      });
+        fileSystem.root.getFile("temp/kisei.txt", {
+            'create': false
+        }, function(fileEntry) {
+            fileEntry.remove(function() {
+                console.log('temp/kisei.txt:removed.');
+            });
+        });
     });
-  });
 }
 
 

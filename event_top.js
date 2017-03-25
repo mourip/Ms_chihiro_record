@@ -53,16 +53,16 @@ event_top.jsが提供する機能
 //次の年に同じイベントが来ることは想定していないためold_resultのファイルの日程がかぶる可能性がある（アニバーサリーについてはそのとき考える）
 
 
-function get_dates(){
+function get_dates() {
     //現在時刻をmomentオブジェクトとして取得
-    var now=moment();
+    var now = moment();
     // フォーマットに沿って時刻を出力
-    var dates=now.format('YYYY/MM/DD/HH/mm/ss');
+    var dates = now.format('YYYY/MM/DD/HH/mm/ss');
     return dates;
 }
 
-function commma_delete(pt_str){
-    var pt="";
+function commma_delete(pt_str) {
+    var pt = "";
     if (isNaN(pt_str)) //,が含まれている時はNAN(Not a Number)として判定される
     {
         var pt_array = pt_str.split(",");
@@ -79,7 +79,7 @@ function commma_delete(pt_str){
 
 
 // ツアーに関する関数
-function carnival_log(){
+function carnival_log() {
     //現在のポイントの処理を行う
     //総合ポイントのセレクタ-。これは毎回変える必要があると思う
     // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
@@ -96,7 +96,7 @@ function carnival_log(){
     // ,を削除する
 
     if (pt_selector) {
-        pt=commma_delete(pt_str);
+        pt = commma_delete(pt_str);
     }
     var now_pt = pt;
 
@@ -107,9 +107,9 @@ function carnival_log(){
     var now_rank_n = rank.substr(0, rank.length - 1);
 
     // 順位も,がドリフ？では入るので削除する。ついでに関数化
-    var now_rank_nn=commma_delete(now_rank_n);
+    var now_rank_nn = commma_delete(now_rank_n);
     // pt_checkerの引数に１を渡す。これでツアー独特のヘッダーに対応する
-    pt_checker("event/carnival.txt",now_pt,now_rank_nn,1);
+    pt_checker("event/carnival.txt", now_pt, now_rank_nn, 1);
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#carnival_header > div.event_items > div:nth-child(1)").innerText.split("×")[1];
     // console.log(normal_drink_num);
@@ -121,7 +121,7 @@ function carnival_log(){
 
 
 // ドリフに関する関数
-function dream_log(){
+function dream_log() {
     //現在のポイントの処理を行う
     //総合ポイントのセレクタ-。これは毎回変える必要があると思う
     // 0ptのときとはセレクタ-が違う可能性あり。一応稼いでからじゃないと記録できない。
@@ -132,7 +132,7 @@ function dream_log(){
     var pt = "";
     // console.log(pt_str);
     if (pt_selector) {
-        pt=commma_delete(pt_str);
+        pt = commma_delete(pt_str);
     }
 
     var now_pt = pt;
@@ -142,9 +142,9 @@ function dream_log(){
     var now_rank_n = rank.substr(0, rank.length - 1);
 
     // 順位も,がドリフ？では入るので削除する。ついでに関数化
-    var now_rank_nn=commma_delete(now_rank_n);
+    var now_rank_nn = commma_delete(now_rank_n);
 
-    pt_checker("event/dream.txt",now_pt,now_rank_nn);
+    pt_checker("event/dream.txt", now_pt, now_rank_nn);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(1)").innerText.split("×")[1];
@@ -188,7 +188,7 @@ function challenge_log() {
     // 位を削除する
     var now_rank_n = rank.substr(0, rank.length - 1);
 
-    pt_checker("event/challenge.txt",now_pt,now_rank_n);
+    pt_checker("event/challenge.txt", now_pt, now_rank_n);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#idol_stage_slide > div > ul > li:nth-child(1) > div > div.event_items > div:nth-child(1)").innerText.split("×")[1];
@@ -235,7 +235,7 @@ function fes_log() {
     var now_rank_n = rank.substr(0, rank.length - 1);
 
     //ポイントに関して記述することを想定する
-    pt_checker("event/fes.txt",now_pt,now_rank_n);
+    pt_checker("event/fes.txt", now_pt, now_rank_n);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var energy_num = document.querySelector("#top > section.event_main_graphic.pmf_top_bgArea > div.event_items > div:nth-child(2)").innerText.split("×")[1];
@@ -284,7 +284,7 @@ function royale_log() {
     var now_rank_n = rank.substr(0, rank.length - 1);
 
     //ポイントに関して記述することを想定する
-    pt_checker("event/royale.txt",now_pt,now_rank_n);
+    pt_checker("event/royale.txt", now_pt, now_rank_n);
 
     //ここからアイテムの記録に関する処理(セレクターを変更する)
     var normal_drink_num = document.querySelector("#top > section.event_main_graphic > div.event_items > div:nth-child(1)").innerText.split("×")[1];
@@ -381,57 +381,57 @@ function copy_data_read(input_file, output_file) {
 
 //アイテムデータを読み込む関数
 function item_checker(filename, drink_num) {
-  console.log(filename+"確認");
-  navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
-      window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
-          // ファイル取得
-          fs.root.getFile(filename, {
-              create: true
-          }, function(fileEntry) {
-              fileEntry.file(function(file) {
-                  var reader = new FileReader();
-                  reader.onloadend = function(e) {
-                      data = e.target.result;
-                      // console.log(data);
-                      if (!data) {
-                          console.log("白紙なので、作成します")
-                          item_writer(filename, drink_num, 0);
-                      } else if (data) {
-                          var array_temp = data.split("\n");
-                          var last_item_num = array_temp[array_temp.length - 2].split(",")[1];
-                          console.log(last_item_num);
+    console.log(filename + "確認");
+    navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
+        window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
+            // ファイル取得
+            fs.root.getFile(filename, {
+                create: true
+            }, function(fileEntry) {
+                fileEntry.file(function(file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function(e) {
+                        data = e.target.result;
+                        // console.log(data);
+                        if (!data) {
+                            console.log("白紙なので、作成します")
+                            item_writer(filename, drink_num, 0);
+                        } else if (data) {
+                            var array_temp = data.split("\n");
+                            var last_item_num = array_temp[array_temp.length - 2].split(",")[1];
+                            console.log(last_item_num);
 
-                          //ここからアップデートが必要かを判断する関数に飛ばす
-                          if (String(last_item_num) != String(drink_num)) {
-                              console.log(filename+":更新します");
-                              item_writer(filename, Number(drink_num), Number(drink_num) - Number(last_item_num));
-                          } else {
-                              console.log(filename+":更新しない");
-                          }
-                      }
-                  };
-                  reader.readAsText(file);
-              });
-          });
-      });
-  });
+                            //ここからアップデートが必要かを判断する関数に飛ばす
+                            if (String(last_item_num) != String(drink_num)) {
+                                console.log(filename + ":更新します");
+                                item_writer(filename, Number(drink_num), Number(drink_num) - Number(last_item_num));
+                            } else {
+                                console.log(filename + ":更新しない");
+                            }
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            });
+        });
+    });
 }
 
 //アイテムを記録するための関数
 function item_writer(filename, drink_num, drink_dif) {
-    console.log(filename+"記述");
-    var num=drink_num;
-    var dif=drink_dif;
+    console.log(filename + "記述");
+    var num = drink_num;
+    var dif = drink_dif;
 
     var dates = get_dates();
     // console.log(dates);
     var utf8num = unescape(encodeURIComponent(num));
     var utf8dif = unescape(encodeURIComponent(dif));
 
-    var txt_name =filename;
-    var header_kind=filename.split("/")[1].split(".")[0];
-        // PRESISTENTで勝手に削除されないようにする
-    webkitRequestFileSystem(PERSISTENT, 1024 * 1024*5, function(fileSystem) {
+    var txt_name = filename;
+    var header_kind = filename.split("/")[1].split(".")[0];
+    // PRESISTENTで勝手に削除されないようにする
+    webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 5, function(fileSystem) {
 
         fileSystem.root.getFile(txt_name, {
             'create': true
@@ -476,20 +476,19 @@ function item_writer(filename, drink_num, drink_dif) {
 }
 
 // ポイントを読み込むための関数
-function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
+function pt_checker(filename, now_pt, now_rank_n, header_flag = 0) {
     var start_end_day;
-    if(header_flag==0){
+    if (header_flag == 0) {
         // ツアー以外はこの処理でいける
         console.log("ツアー以外やな");
-        start_end_day=header_to_date();
-    }
-    else if(header_flag==1){
+        start_end_day = header_to_date();
+    } else if (header_flag == 1) {
         // ツアーはここにつく
         console.log("ツアーやな");
-        start_end_day=header_to_date2();
+        start_end_day = header_to_date2();
     }
 
-    console.log(filename+"確認");
+    console.log(filename + "確認");
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 10, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             // ファイル取得
@@ -502,8 +501,8 @@ function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
                         data = e.target.result;
                         // console.log(data);
                         if (!data) {
-                            console.log(filename+":白紙なので、作成します");
-                            pt_write(filename,now_pt, 0, now_rank_n, 0,header_flag);
+                            console.log(filename + ":白紙なので、作成します");
+                            pt_write(filename, now_pt, 0, now_rank_n, 0, header_flag);
 
                         } else if (data) {
                             // データのすべてを得る
@@ -513,14 +512,14 @@ function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
                             var first_line = array_temp[0];
                             if (first_line != start_end_day) {
                                 // 旧データ群はold_resultに入れる
-                                console.log(filename+":古いデータなのでコピーする")
+                                console.log(filename + ":古いデータなのでコピーする")
                                 //出力ファイル名
-                                var file_start_d=first_line.split("~")[0];
-                                var output_file_name =  file_start_d+".txt";
+                                var file_start_d = first_line.split("~")[0];
+                                var output_file_name = file_start_d + ".txt";
                                 // 現在のファイル名からイベント名を取得する
                                 // event/fes.txt
-                                var event_name=filename.split("/")[1].split(".")[0];
-                                output_file="old_event/"+event_name+"/"+output_file_name;
+                                var event_name = filename.split("/")[1].split(".")[0];
+                                output_file = "old_event/" + event_name + "/" + output_file_name;
                                 // コピー対象のファイルを読み込む
                                 copy_data_read(filename, output_file);
                             } else {
@@ -533,10 +532,10 @@ function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
 
                                 //ポイントと順位のいずれかが違う場合は更新する
                                 if (String(last_pt) != String(now_pt) || String(last_rank) != String(now_rank_n)) {
-                                    console.log(filename+":更新します");
-                                    pt_write(filename,now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
+                                    console.log(filename + ":更新します");
+                                    pt_write(filename, now_pt, Number(now_pt) - Number(last_pt), now_rank_n, Number(last_rank) - Number(now_rank_n));
                                 } else {
-                                    console.log(filename+":更新しない");
+                                    console.log(filename + ":更新しない");
                                 }
                             }
                         }
@@ -549,7 +548,7 @@ function pt_checker(filename,now_pt,now_rank_n,header_flag=0){
 }
 
 // ポイントを記録するための関数
-function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
+function pt_write(filename, pt, pt_dif, rank, rank_dif, header_flag) {
 
     // 現在の日付の取得
 
@@ -563,28 +562,29 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
     var start_end_day;
     var start_day;
     var end_day;
-    if(flag==0){
+    if (flag == 0) {
         // ツアー以外はこの処理でいける
         console.log("ツアー以外やな");
         var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
         start_day = headers_text[1].split("/");
         end_day = headers_text[2].split("～")[1].split("/");
-        start_end_day=header_to_date();
-    }
-    else if(flag){
+        start_end_day = header_to_date();
+    } else if (flag) {
         // ツアーはここにつく
         console.log("ツアーやな");
         var headers_text = document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period").innerText.split(" ");
         start_day = headers_text[1].split("/");
         end_day = headers_text[2].split("～")[1].split("/");
-        start_end_day=header_to_date2();
+        start_end_day = header_to_date2();
     }
     //ヘッダー行のからのイベント期間の取得
     // PRESISTENTで勝手に削除されないようにする
     console.log
     webkitRequestFileSystem(PERSISTENT, 1024 * 1024 * 10, function(fileSystem) {
 
-        fileSystem.root.getFile(filename, {'create': true},function(fileEntry) {
+        fileSystem.root.getFile(filename, {
+            'create': true
+        }, function(fileEntry) {
             fileEntry.createWriter(function(fileWriter) {
 
                 //  ファイルの書き込み位置は、一番最後とする
@@ -620,7 +620,7 @@ function pt_write(filename,pt,pt_dif,rank,rank_dif,header_flag){
 }
 
 //ヘッダーから日付を得るための関数
-function header_to_date(){
+function header_to_date() {
     var headers_text = document.querySelector("#event_header_info").innerText.split(" ");
     var start_day = headers_text[1].split("/");
     var end_day = headers_text[2].split("～")[1].split("/");
@@ -662,7 +662,7 @@ function header_to_date(){
 }
 
 //ヘッダーから日付を得るための関数
-function header_to_date2(){
+function header_to_date2() {
     var headers_text = document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period").innerText.split(" ");
     var start_day = headers_text[1].split("/");
     var end_day = headers_text[2].split("～")[1].split("/");
@@ -877,25 +877,24 @@ function event_checker() {
         challenge_log();
     else if (document.querySelector("#event_pmf") != null)
         fes_log();
-    else if(document.querySelector("#event_royale")!=null)
+    else if (document.querySelector("#event_royale") != null)
         royale_log();
-    else if(document.querySelector("#event_dream") != null)
+    else if (document.querySelector("#event_dream") != null)
         dream_log();
 }
 
 
 //トップページのみ動作する
-if(document.querySelector("#event_header_info")!=null){
+if (document.querySelector("#event_header_info") != null) {
     directry_root();
     event_checker();
-}
-else{
+} else {
     console.log("ないで");
 }
 
 // ほぼツアー専用？
 // セレクタ-は日程のところを取得している
-if(document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period")!=null){
+if (document.querySelector("#top > div.displayBox.m-Btm5 > div:nth-child(1) > div.event_period") != null) {
     directry_root();
     carnival_log();
 

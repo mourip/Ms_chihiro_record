@@ -371,7 +371,7 @@ function notifications_chi_heal(txt,flag){
 
 
 //alart音+全快のお知らせ
-function work_alert(){
+function work_alert() {
 
     /*
     var oscillator = audioCtx.createOscillator();
@@ -385,14 +385,14 @@ function work_alert(){
     */
     var n = new Notification("全回復してますよ\nライブしてくださいね！");
     var soundSrc = "a.mp3";
-    if (soundSrc){
+    if (soundSrc) {
         console.log("aaaa");
-      var playsrc = null;
-      playsrc = chrome.extension.getURL( ("./sound/"+soundSrc) );	//任意の場所というかpath的な
-      var audio = new Audio("");
-      audio.src = playsrc;	//URL
-      audio.volume = (30 / 100);	//30%のぼりゅーむ？]
-      audio.play();
+        var playsrc = null;
+        playsrc = chrome.extension.getURL(("./sound/" + soundSrc)); //任意の場所というかpath的な
+        var audio = new Audio("");
+        audio.src = playsrc; //URL
+        audio.volume = (30 / 100); //30%のぼりゅーむ？]
+        audio.play();
     }
 
     //通知は3000ミリ秒表示する
@@ -400,22 +400,22 @@ function work_alert(){
 }
 
 // ドリフに関する関数
-function dream_log(){
+function dream_log() {
     /*
     今のAPと最大のAPを得る
     */
     //bpの表示がなかったら以降の処理を打ち切る
     console.log("ドリフですよー");
-    if(document.querySelector("#bpImg")==null){
-         console.log("apを示すセレクタ-が無いです");
-         return ;
+    if (document.querySelector("#bpImg") == null) {
+        console.log("apを示すセレクタ-が無いです");
+        return;
     }
 
-    var now_bp=document.querySelector("#bpImg").innerText.split(" ")[2];
-    var max_bp=document.querySelector("#bpImg").innerText.split(" ")[4];
+    var now_bp = document.querySelector("#bpImg").innerText.split(" ")[2];
+    var max_bp = document.querySelector("#bpImg").innerText.split(" ")[4];
 
     /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
-    if(now_bp==max_bp && document.querySelector("#top > div.m-Btm10 > a > div > span")!=null){
+    if (now_bp == max_bp && document.querySelector("#top > div.m-Btm10 > a > div > span") != null) {
         // console.log("aaa");
         work_alert();
         // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
@@ -424,11 +424,11 @@ function dream_log(){
     // ここからちひーるの記録にうつる
     // 数字以外がはいらないように安全弁をつける
     console.log(now_bp);
-    if(Number(now_bp) ){
+    if (Number(now_bp)) {
         // chi_heal_checker(now_bp);
     }
     //０はNaNらしいですよー
-    else if(now_bp=="0"){
+    else if (now_bp == "0") {
         // chi_heal_checker(0);
     }
     // NaNならやらない
@@ -440,25 +440,25 @@ function dream_log(){
 
 
 // TBSに関する関数
-function TBS_log(){
+function TBS_log() {
     /*
     今のTPと最大のTPを得る
     #top > section:nth-child(9) > div.t-Cnt.m-Top5 > div
     */
     //TPの表示がなかったら以降の処理を打ち切る
     console.log("TBSですよー");
-    if(document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div")==null){
-         console.log("TPを示すセレクタ-が無いです");
-         return ;
+    if (document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div") == null) {
+        console.log("TPを示すセレクタ-が無いです");
+        return;
     }
 
-    var now_TP=document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div").innerText.split(" ")[0].split("：")[1];
-    var max_TP=document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div").innerText.split(" ")[2];
+    var now_TP = document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div").innerText.split(" ")[0].split("：")[1];
+    var max_TP = document.querySelector("#top > section:nth-child(9) > div.t-Cnt.m-Top5 > div").innerText.split(" ")[2];
 
     console.log(now_TP);
     console.log(max_TP);
     /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
-    if(now_TP==max_TP){
+    if (now_TP == max_TP) {
         // console.log("aaa");
         work_alert();
         // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
@@ -474,12 +474,12 @@ function carnival_log() {
     console.log("ツアーですよ");
     // ツアーではなぜか色々な情報がセレクタ-に入っているので改行でsplitする
     //ここのセレクタ-を変更する
-    var lp=document.querySelector("#bpImg").innerText.split("\n")[0]
-    var maxlp=lp.split(" ")[4].split("　")[0]
-    var nowlp=lp.split(" ")[2]
+    var lp = document.querySelector("#bpImg").innerText.split("\n")[0]
+    var maxlp = lp.split(" ")[4].split("　")[0]
+    var nowlp = lp.split(" ")[2]
     console.log(maxlp)
     console.log(nowlp)
-    if(maxlp==nowlp){
+    if (maxlp == nowlp) {
         // console.log("警報");
         work_alert();
     }
@@ -487,7 +487,7 @@ function carnival_log() {
 
 
 // チャレに関する関数
-function challenge_log(){
+function challenge_log() {
     /*
     今のAPと最大のAPを得る
     */
@@ -499,40 +499,37 @@ function challenge_log(){
     // #top > section:nth-child(8) > div:nth-child(3)
     // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
     // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
-    var now_bp="";
-    var max_bp="";
+    var now_bp = "";
+    var max_bp = "";
 
     // セレクタ－が２種類以上あるためこれで対処
-    if(document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)")!=null){
-        var cptext0=document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[0]
-        var cptext1=document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[1]
+    if (document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)") != null) {
+        var cptext0 = document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[0]
+        var cptext1 = document.querySelector("#top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[1]
 
-        now_bp=cptext0.split(" ")[1]
-        max_bp=cptext1.split(" ")[0]
-    }
+        now_bp = cptext0.split(" ")[1]
+        max_bp = cptext1.split(" ")[0]
+    } else if (document.querySelector("#top > section:nth-child(8) > div:nth-child(3)") != null) {
+        var cptext0 = document.querySelector("#top > section:nth-child(8) > div:nth-child(3)").innerText.split('/')[0]
+        var cptext1 = document.querySelector("#top > section:nth-child(8) > div:nth-child(3)").innerText.split('/')[1]
 
-    else if(document.querySelector("#top > section:nth-child(8) > div:nth-child(3)")!=null){
-        var cptext0=document.querySelector("#top > section:nth-child(8) > div:nth-child(3)").innerText.split('/')[0]
-        var cptext1=document.querySelector("#top > section:nth-child(8) > div:nth-child(3)").innerText.split('/')[1]
-
-        now_bp=cptext0.split(" ")[1]
-        max_bp=cptext1.split(" ")[0]
+        now_bp = cptext0.split(" ")[1]
+        max_bp = cptext1.split(" ")[0]
     }
     // #top > section:nth-child(8) > div.m-Btm10 > div:nth-child(2)
     // 無課金タイマーなしのとき
-    else if(document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)")!=null){
-      var cptext0=document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[0]
-      var cptext1=document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[1]
-      now_bp=cptext0.split(" ")[1]
-      max_bp=cptext1.split(" ")[0]
-    }
-    else {
+    else if (document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)") != null) {
+        var cptext0 = document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[0]
+        var cptext1 = document.querySelector("#top > section:nth-child(7) > div.m-Btm10 > div:nth-child(2)").innerText.split('/')[1]
+        now_bp = cptext0.split(" ")[1]
+        max_bp = cptext1.split(" ")[0]
+    } else {
         console.log("srekuta-")
         return
     }
 
     /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
-    if(now_bp==max_bp){
+    if (now_bp == max_bp) {
         // console.log("aaa");
         work_alert();
         // document.querySelector("#top > section:nth-child(10) > div:nth-child(5) > a > div > span").click();
@@ -541,18 +538,18 @@ function challenge_log(){
 }
 
 // ロワに関する関数
-function royale_log(){
+function royale_log() {
     /*
     今のBPと最大のBPを得る
     */
     console.log("ロワの仕事やで");
     //bpの表示がなかったら以降の処理を打ち切る
-    if(document.querySelector("#bp_mic")==null){
+    if (document.querySelector("#bp_mic") == null) {
         console.log("bpを示すセレクタ-が無いです");
-        return ;
+        return;
     }
-    var now_bp=document.querySelector("#bp_mic").innerText.split(" ")[2];
-    var max_bp=document.querySelector("#bp_mic").innerText.split(" ")[4];
+    var now_bp = document.querySelector("#bp_mic").innerText.split(" ")[2];
+    var max_bp = document.querySelector("#bp_mic").innerText.split(" ")[4];
 
     /*
     記録取るべきこと
@@ -565,7 +562,7 @@ function royale_log(){
     */
 
     /*BPが等しい+ロワライブの判定あるなら通知+警告音の再生を行う*/
-    if(now_bp==max_bp && document.querySelector("#top > section:nth-child(8) > div.t-Cnt.m-Btm5 > a > div > span")!=null){
+    if (now_bp == max_bp && document.querySelector("#top > section:nth-child(8) > div.t-Cnt.m-Btm5 > a > div > span") != null) {
 
         work_alert();
         // document.querySelector("#top > section:nth-child(8) > div.t-Cnt.m-Btm5 > a > div > span").click();
@@ -581,7 +578,7 @@ function royale_log(){
 
 
 // ディレクトリを作成する関数
-function directory_root(){
+function directory_root() {
     navigator.webkitPersistentStorage.requestQuota(1024 * 1024 * 5, function(bytes) {
         window.webkitRequestFileSystem(window.PERSISTENT, bytes, function(fs) {
             fs.root.getDirectory("temp", {
@@ -617,30 +614,30 @@ function directory_root(){
 }
 
 //イベントの種類を判定する関数
-function event_checker(){
+function event_checker() {
     if (document.querySelector("#event_challenge") != null)
         challenge_log();
-    else if (document.querySelector("#event_pmf")  != null)
+    else if (document.querySelector("#event_pmf") != null)
         fes_log();
-    else if(document.querySelector("#event_royale")!= null)
+    else if (document.querySelector("#event_royale") != null)
         royale_log();
-    else if(document.querySelector("#event_dream") != null)
+    else if (document.querySelector("#event_dream") != null)
         dream_log();
-    else if(document.querySelector("#event_teamtalk") != null)
+    else if (document.querySelector("#event_teamtalk") != null)
         TBS_log();
-    else if(document.querySelector("#event_carnival")!=null){
+    else if (document.querySelector("#event_carnival") != null) {
         carnival_log();
     }
 }
 
 //通知の許可を得るための関数
-function notifications_permission(){
+function notifications_permission() {
     // Notification対応しているかどうか
     if (window.Notification) {
         // Permissionの確認
         // 許可が取れていない場合はNotificationの許可を取る
         console.log("通知できまっせ");
-        if (Notification.permission === 'denied'|| Notification.permission === 'default'){
+        if (Notification.permission === 'denied' || Notification.permission === 'default') {
             Notification.requestPermission(function(result) {
                 if (result === 'denied') {
                     alert('リクエスト結果：通知許可されませんでした');
@@ -663,17 +660,17 @@ function notifications_permission(){
 
 
 //色々モーメントに対して試した関数（やりたいことは全部できることを確認済み）
-function moment_test(){
-    var now=moment()
+function moment_test() {
+    var now = moment()
 
-    var test_timea="2016/10/4/16/50/23"
-    var test=moment(test_timea,"YYYY/MM/DD/HH/mm/ss");
-    var now_time=now.format('YYYY/MM/DD/HH/mm/ss');
-    var test_time=test.format('YYYY/MM/DD/HH/mm/ss');
+    var test_timea = "2016/10/4/16/50/23"
+    var test = moment(test_timea, "YYYY/MM/DD/HH/mm/ss");
+    var now_time = now.format('YYYY/MM/DD/HH/mm/ss');
+    var test_time = test.format('YYYY/MM/DD/HH/mm/ss');
     // console.log("今:"+now_time);
     // console.log("例:"+test_time);
-    var diffs=test.diff(now,"m");
-    var test_time2=test.format('DD/HH/mm');
+    var diffs = test.diff(now, "m");
+    var test_time2 = test.format('DD/HH/mm');
     // console.log(test_time2);
     // console.log("差："+diffs);
 
